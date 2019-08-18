@@ -358,6 +358,7 @@ void Settings::LoadDefaultsOrSave(std::string path)
 	settings[XORSTR("ESP")][XORSTR("Hitmarker")][XORSTR("Damage")][XORSTR("enabled")] = Settings::ESP::Hitmarker::Damage::enabled;
 	settings[XORSTR("ESP")][XORSTR("Hitmarker")][XORSTR("Sounds")][XORSTR("enabled")] = Settings::ESP::Hitmarker::Sounds::enabled;
 	settings[XORSTR("ESP")][XORSTR("Hitmarker")][XORSTR("Sounds")][XORSTR("sound")] = (int)Settings::ESP::Hitmarker::Sounds::sound;
+	settings[XORSTR("ESP")][XORSTR("Hitmarker")][XORSTR("Sounds")][XORSTR("volume")] = Settings::ESP::Hitmarker::Sounds::volume;
 	settings[XORSTR("ESP")][XORSTR("HeadDot")][XORSTR("enabled")] = Settings::ESP::HeadDot::enabled;
 	settings[XORSTR("ESP")][XORSTR("HeadDot")][XORSTR("size")] = Settings::ESP::HeadDot::size;
 	settings[XORSTR("ESP")][XORSTR("Spread")][XORSTR("enabled")] = Settings::ESP::Spread::enabled;
@@ -597,7 +598,7 @@ void Settings::LoadDefaultsOrSave(std::string path)
 	settings[XORSTR("Eventlog")][XORSTR("showTeammates")] = Settings::Eventlog::showTeammates;
 	settings[XORSTR("Eventlog")][XORSTR("showLocalplayer")] = Settings::Eventlog::showLocalplayer;
 	settings[XORSTR("Eventlog")][XORSTR("duration")] = Settings::Eventlog::duration;
-	settings[XORSTR("Eventlog")][XORSTR("lines")] = Settings::Eventlog::lines;	
+	settings[XORSTR("Eventlog")][XORSTR("lines")] = Settings::Eventlog::lines;
 	LoadColor(settings[XORSTR("Eventlog")][XORSTR("color")], Settings::Eventlog::color);
 
 	settings[XORSTR("ThirdPerson")][XORSTR("enabled")] = Settings::ThirdPerson::enabled;
@@ -874,6 +875,7 @@ void Settings::LoadConfig(std::string path)
 	GetVal(settings[XORSTR("ESP")][XORSTR("Hitmarker")][XORSTR("Damage")][XORSTR("enabled")], &Settings::ESP::Hitmarker::Damage::enabled);
 	GetVal(settings[XORSTR("ESP")][XORSTR("Hitmarker")][XORSTR("Sounds")][XORSTR("enabled")], &Settings::ESP::Hitmarker::Sounds::enabled);
 	GetVal(settings[XORSTR("ESP")][XORSTR("Hitmarker")][XORSTR("Sounds")][XORSTR("sound")], (int*)&Settings::ESP::Hitmarker::Sounds::sound);
+	GetVal(settings[XORSTR("ESP")][XORSTR("Hitmarker")][XORSTR("Sounds")][XORSTR("volume")], &Settings::ESP::Hitmarker::Sounds::volume);
 	GetVal(settings[XORSTR("ESP")][XORSTR("HeadDot")][XORSTR("enabled")], &Settings::ESP::HeadDot::enabled);
 	GetVal(settings[XORSTR("ESP")][XORSTR("HeadDot")][XORSTR("size")], &Settings::ESP::HeadDot::size);
 	GetVal(settings[XORSTR("ESP")][XORSTR("Spread")][XORSTR("enabled")], &Settings::ESP::Spread::enabled);
@@ -1172,7 +1174,7 @@ void Settings::LoadConfig(std::string path)
 	GetVal(settings[XORSTR("Eventlog")][XORSTR("showTeammates")], &Settings::Eventlog::showTeammates);
 	GetVal(settings[XORSTR("Eventlog")][XORSTR("showLocalplayer")], &Settings::Eventlog::showLocalplayer);
 	GetVal(settings[XORSTR("Eventlog")][XORSTR("duration")], &Settings::Eventlog::duration);
-	GetVal(settings[XORSTR("Eventlog")][XORSTR("lines")], &Settings::Eventlog::lines);	
+	GetVal(settings[XORSTR("Eventlog")][XORSTR("lines")], &Settings::Eventlog::lines);
 	GetVal(settings[XORSTR("Eventlog")][XORSTR("color")], &Settings::Eventlog::color);
 
 	GetVal(settings[XORSTR("ThirdPerson")][XORSTR("enabled")], &Settings::ThirdPerson::enabled);

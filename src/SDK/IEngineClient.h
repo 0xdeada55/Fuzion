@@ -94,4 +94,19 @@ public:
 		typedef void (* oClientCmd_Unrestricted)(void*, const char*);
 		return getvfunc<oClientCmd_Unrestricted>(this, 113)(this, szCmdString);
 	}
+	void ClientCmd_Unrestrictedf(const char* szCmdString, ...) // maybe... maybe not.
+	{
+		va_list ap;
+		if (szCmdString == NULL)
+			return;
+
+		char	tmp[512];
+		memset(tmp, 0, 512);
+
+		va_start(ap, szCmdString);
+		vsnprintf(tmp, sizeof(tmp) - 1, szCmdString, ap);
+		va_end(ap);
+
+		return ClientCmd_Unrestricted(tmp);
+	}
 };

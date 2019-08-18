@@ -18,6 +18,7 @@ int Settings::ESP::Hitmarker::size = 16;
 int Settings::ESP::Hitmarker::innerGap = 5;
 bool Settings::ESP::Hitmarker::Damage::enabled = false;
 bool Settings::ESP::Hitmarker::Sounds::enabled = false;
+float Settings::ESP::Hitmarker::Sounds::volume = 1.0;
 Sound Settings::ESP::Hitmarker::Sounds::sound = Sound::NONE;
 
 // int - damage dealt, long - timestamp
@@ -126,43 +127,46 @@ void Hitmarkers::FireGameEvent(IGameEvent* event)
 	lastHitmarkerTimestamp = now;
 	damages.insert(damages.begin(), std::pair<int, long>(event->GetInt(XORSTR("dmg_health")), now));
 
-	if( Settings::ESP::Hitmarker::Sounds::enabled ){
-		switch( Settings::ESP::Hitmarker::Sounds::sound ){
+	if (Settings::ESP::Hitmarker::Sounds::enabled)
+	{
+		std::string soundcmd;
+		switch (Settings::ESP::Hitmarker::Sounds::sound)
+		{
 			case Sound::SPONGEBOB:
-				engine->ClientCmd_Unrestricted( "play training\\scoreregular" );
+				engine->ClientCmd_Unrestrictedf( "playvol training\\scoreregular %f", Settings::ESP::Hitmarker::Sounds::volume );
 				break;
 			case Sound::HALFLIFE:
-				engine->ClientCmd_Unrestricted( "play ui\\beep22" );
+				engine->ClientCmd_Unrestrictedf( "playvol ui\\beep22 %f", Settings::ESP::Hitmarker::Sounds::volume );
 				break;
 			case Sound::HALFLIFE2:
-				engine->ClientCmd_Unrestricted( "play common\\beep" );
+				engine->ClientCmd_Unrestrictedf( "playvol common\\beep %f", Settings::ESP::Hitmarker::Sounds::volume );
 				break;
 			case Sound::HALFLIFE3:
-				engine->ClientCmd_Unrestricted( "play items\\medshot4" );
+				engine->ClientCmd_Unrestrictedf( "playvol items\\medshot4 %f", Settings::ESP::Hitmarker::Sounds::volume );
 				break;
 			case Sound::HALFLIFE4:
-				engine->ClientCmd_Unrestricted( "play buttons\\blip1" );
+				engine->ClientCmd_Unrestrictedf( "playvol buttons\\blip1 %f", Settings::ESP::Hitmarker::Sounds::volume );
 				break;
 			case Sound::BBGUNBELL:
-				engine->ClientCmd_Unrestricted( "play training\\bell_impact" );
+				engine->ClientCmd_Unrestrictedf( "playvol training\\bell_impact %f", Settings::ESP::Hitmarker::Sounds::volume );
 				break;
 			case Sound::DOPAMINE:
-				engine->ClientCmd_Unrestricted( "play ui\\csgo_ui_crate_open" );
+				engine->ClientCmd_Unrestrictedf( "playvol ui\\csgo_ui_crate_open %f", Settings::ESP::Hitmarker::Sounds::volume );
 				break;
 			case Sound::WUB:
-				engine->ClientCmd_Unrestricted( "play ui\\csgo_ui_store_rollover" );
+				engine->ClientCmd_Unrestrictedf( "playvol ui\\csgo_ui_store_rollover %f", Settings::ESP::Hitmarker::Sounds::volume );
 				break;
 			case Sound::PEDOYES:
-				engine->ClientCmd_Unrestricted( "play radio\\legacy_yesss" );
+				engine->ClientCmd_Unrestrictedf( "playvol radio\\legacy_yesss %f", Settings::ESP::Hitmarker::Sounds::volume );
 				break;
 			case Sound::MEME:
-				engine->ClientCmd_Unrestricted( "play commander\\train_guntestcomplete_01" );
+				engine->ClientCmd_Unrestrictedf( "playvol commander\\train_guntestcomplete_01 %f", Settings::ESP::Hitmarker::Sounds::volume );
 				break;
 			case Sound::ERROR:
-				engine->ClientCmd_Unrestricted( "play error" );
+				engine->ClientCmd_Unrestrictedf( "playvol error %f", Settings::ESP::Hitmarker::Sounds::volume );
 				break;
 			case Sound::ORCHESTRAL:
-				engine->ClientCmd_Unrestricted( "playvol player\\orch_hit_csharp_short 0.8" );
+				engine->ClientCmd_Unrestrictedf( "playvol player\\orch_hit_csharp_short %f", Settings::ESP::Hitmarker::Sounds::volume ); // 0.8
 				break;
 			default:
 				break;

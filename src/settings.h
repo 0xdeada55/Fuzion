@@ -796,6 +796,7 @@ namespace Settings
 			namespace Sounds {
 				extern bool enabled;
 				extern Sound sound;
+				extern float volume;
 			}
 		}
 
@@ -854,16 +855,16 @@ namespace Settings
 		extern bool enabled;
 		extern float radius;
 	}
-	
+
 	namespace Eventlog
 	{
 		extern bool showEnemies;
 		extern bool showTeammates;
-		extern bool showLocalplayer;		
+		extern bool showLocalplayer;
 		extern float duration;
-		extern float lines;		
+		extern float lines;
 		extern ColorVar color;
-	}	
+	}
 
 	namespace Spammer
 	{

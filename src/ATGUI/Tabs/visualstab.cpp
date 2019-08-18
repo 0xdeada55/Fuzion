@@ -218,7 +218,7 @@ void Visuals::RenderTab()
 			ImGui::Columns(2, nullptr, true);
 			{
 				ImGui::Checkbox(XORSTR("Show Enemies"), &Settings::Eventlog::showEnemies);
-				ImGui::Checkbox(XORSTR("Show Allies"), &Settings::Eventlog::showTeammates);				
+				ImGui::Checkbox(XORSTR("Show Allies"), &Settings::Eventlog::showTeammates);
 
 			}
 			ImGui::NextColumn();
@@ -510,6 +510,7 @@ void Visuals::RenderTab()
 				ImGui::SliderInt(XORSTR("##HITMARKERSIZE"), &Settings::ESP::Hitmarker::size, 1, 32, XORSTR("Size: %0.f"));
 				ImGui::SliderInt(XORSTR("##HITMARKERGAP"), &Settings::ESP::Hitmarker::innerGap, 1, 16, XORSTR("Gap: %0.f"));
                 ImGui::Combo( XORSTR ( "Sounds##HITMARKERCOMBO" ), ( int* ) &Settings::ESP::Hitmarker::Sounds::sound, Sounds, IM_ARRAYSIZE( Sounds ) );
+				ImGui::SliderFloat(XORSTR("##HITMARKERS"), &Settings::ESP::Hitmarker::Sounds::volume, 0.1f, 1.f, XORSTR("Volume: %0.1f"));
                 ImGui::PopItemWidth();
 			}
 			ImGui::Columns(1);
