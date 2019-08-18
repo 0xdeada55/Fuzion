@@ -383,6 +383,8 @@ static void DoAntiAimX(QAngle& angle, bool& clamp)
 
 void AntiAim::CreateMove(CUserCmd* cmd)
 {
+	AntiAim::realAngle = AntiAim::fakeAngle = CreateMove::lastTickViewAngles;
+
     if (!Settings::AntiAim::Yaw::enabled && !Settings::AntiAim::Pitch::enabled && !Settings::AntiAim::LBYBreaker::enabled)
         return;
 
@@ -392,8 +394,6 @@ void AntiAim::CreateMove(CUserCmd* cmd)
     QAngle oldAngle = cmd->viewangles;
     float oldForward = cmd->forwardmove;
     float oldSideMove = cmd->sidemove;
-    
-    AntiAim::realAngle = AntiAim::fakeAngle = CreateMove::lastTickViewAngles;
 
     QAngle angle = cmd->viewangles;
 
