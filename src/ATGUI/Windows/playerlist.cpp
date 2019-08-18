@@ -149,7 +149,7 @@ void PlayerList::RenderWindow()
 					ImGui::Text("%d/%d/%d", (*csPlayerResource)->GetKills(it),(*csPlayerResource)->GetAssists(it), (*csPlayerResource)->GetDeaths(it));
 					ImGui::NextColumn();
 
-					ImGui::Text("%s", ESP::ranks[*(*csPlayerResource)->GetCompetitiveRanking(it)]);
+					ImGui::Text("%s", (Util::IsDangerZone() ? ESP::dzRanks[*(*csPlayerResource)->GetCompetitiveRanking(it)] : ESP::ranks[*(*csPlayerResource)->GetCompetitiveRanking(it)]));
 					ImGui::NextColumn();
 
 					ImGui::Text("%d", *(*csPlayerResource)->GetCompetitiveWins(it));

@@ -194,6 +194,25 @@ const char* ESP::ranks[] = {
 		"The Global Elite"
 };
 
+const char* ESP::dzRanks[] = {
+		"Unranked",
+		"Lab Rat I",
+		"Lab Rat II",
+		"Sprinting Hare I",
+		"Sprinting Hare II",
+		"Wild Scout I",
+		"Wild Scout II",
+		"Wild Scout Elite",
+		"Hunter Fox I",
+		"Hunter Fox II",
+		"Hunter Fox III",
+		"Hunter Fox Elite",
+		"Timber Wolf",
+		"Ember Wolf",
+		"Wildfire Wolf",
+		"The Howling Alpha"
+};
+
 bool dzShouldDraw(C_BaseEntity* ent, C_BasePlayer* localplayer) // Ghetto way to fix a CTD.
 {
 	if (!localplayer || !ent || !localplayer->GetAlive())
@@ -922,8 +941,8 @@ static void DrawPlayerText( C_BasePlayer* player, C_BasePlayer* localplayer, int
 		int rank = *( *csPlayerResource )->GetCompetitiveRanking( player->GetIndex() );
 
 		if ( rank >= 0 && rank < 19 ) {
-			Vector2D rankSize = Draw::GetTextSize( ESP::ranks[rank], esp_font );
-			Draw::AddText( ( x + ( w / 2 ) - ( rankSize.x / 2 ) ), ( y - ( textSize.y * lineNum ) - nameOffset ), ESP::ranks[rank], Entity::IsTeamMate(player, localplayer) ? Settings::ESP::allyInfoColor.Color() : Settings::ESP::enemyInfoColor.Color() );
+			Vector2D rankSize = Draw::GetTextSize( (Util::IsDangerZone() ? ESP::dzRanks[rank] : ESP::ranks[rank]), esp_font );
+			Draw::AddText( ( x + ( w / 2 ) - ( rankSize.x / 2 ) ), ( y - ( textSize.y * lineNum ) - nameOffset ), (Util::IsDangerZone() ? ESP::dzRanks[rank] : ESP::ranks[rank]), Entity::IsTeamMate(player, localplayer) ? Settings::ESP::allyInfoColor.Color() : Settings::ESP::enemyInfoColor.Color() );
 		}
 	}
 
