@@ -147,6 +147,11 @@ namespace Util
 				case ItemDefinitionIndex::WEAPON_KNIFE_WIDOWMAKER:
 				case ItemDefinitionIndex::WEAPON_KNIFE_GHOST:
 				//case ItemDefinitionIndex::WEAPON_KNIFEGG:
+				// DangerZone Update
+				case ItemDefinitionIndex::WEAPON_FISTS:
+				case ItemDefinitionIndex::WEAPON_AXE:
+				case ItemDefinitionIndex::WEAPON_HAMMER:
+				case ItemDefinitionIndex::WEAPON_SPANNER:
 					return true;
 				default:
 					return false;
@@ -164,6 +169,14 @@ namespace Util
 				case ItemDefinitionIndex::WEAPON_MOLOTOV:
 				case ItemDefinitionIndex::WEAPON_SMOKEGRENADE:
 				case ItemDefinitionIndex::WEAPON_DECOY:
+
+				// DangerZone Update
+				case ItemDefinitionIndex::WEAPON_TAGRENADE:
+				case ItemDefinitionIndex::WEAPON_BREACHCHARGE:
+				case ItemDefinitionIndex::WEAPON_FIREBOMB:
+				case ItemDefinitionIndex::WEAPON_DIVERSION:
+				case ItemDefinitionIndex::WEAPON_FRAG_GRENADE:
+				case ItemDefinitionIndex::WEAPON_BUMPMINE:
 					return true;
 				default:
 					return false;
@@ -236,6 +249,19 @@ namespace Util
 				case ItemDefinitionIndex::WEAPON_SCAR20:
 				case ItemDefinitionIndex::WEAPON_SG556:
 				case ItemDefinitionIndex::WEAPON_SSG08:
+					return true;
+				default:
+					return false;
+			}
+		}
+
+		bool IsStuff(ItemDefinitionIndex index)
+		{
+			switch (index)
+			{
+				case ItemDefinitionIndex::WEAPON_SHIELD:
+				case ItemDefinitionIndex::WEAPON_HEALTHSHOT:
+				case ItemDefinitionIndex::WEAPON_TABLET:
 					return true;
 				default:
 					return false;
