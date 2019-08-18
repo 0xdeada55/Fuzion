@@ -642,6 +642,7 @@ namespace Settings
 		extern ColorVar molotovColor;
 		extern ColorVar mineColor;
 		extern ColorVar chargeColor;
+		extern ColorVar sonarColor;
 		extern ColorVar allyInfoColor;
 		extern ColorVar enemyInfoColor;
 		extern HealthColorVar localplayerColor;

@@ -88,6 +88,7 @@ void Colors::RenderWindow()
 			{ "ESP - Molotov", &Settings::ESP::molotovColor },
 			{ "ESP - Bump Mine", &Settings::ESP::mineColor },
 			{ "ESP - Breach Charge", &Settings::ESP::chargeColor },
+			{ "ESP - TA Grenade", &Settings::ESP::sonarColor },
 			{ "ESP - Skeleton (Team)", &Settings::ESP::Skeleton::allyColor },
 			{ "ESP - Skeleton (Enemy)", &Settings::ESP::Skeleton::enemyColor },
 			{ "ESP - Player Info (Team)", &Settings::ESP::allyInfoColor },

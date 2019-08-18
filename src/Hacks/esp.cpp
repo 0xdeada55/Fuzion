@@ -44,6 +44,7 @@ ColorVar Settings::ESP::grenadeColor = ImColor(244, 67, 54, 255);
 ColorVar Settings::ESP::molotovColor = ImColor(205, 32, 31, 255);
 ColorVar Settings::ESP::mineColor = ImColor(205, 32, 31, 255);
 ColorVar Settings::ESP::chargeColor = ImColor(205, 32, 31, 255);
+ColorVar Settings::ESP::sonarColor = ImColor(205, 32, 31, 255);
 ColorVar Settings::ESP::allyInfoColor = ImColor(255, 255, 255, 255);
 ColorVar Settings::ESP::enemyInfoColor = ImColor(255, 255, 255, 255);
 ColorVar Settings::ESP::Skeleton::allyColor = ImColor(255, 255, 255, 255);
@@ -1419,6 +1420,18 @@ static void DrawThrowable(C_BaseEntity* throwable, ClientClass* client, C_BasePl
 			nadeColor = Settings::ESP::chargeColor.Color();
 			break;
 		}
+		else if (strstr(mat->GetName(), XORSTR("sonar_bomb"))) // tagrenade
+		{
+			nadeName = XORSTR("TA Grenade (placed)");
+			nadeColor = Settings::ESP::sonarColor.Color();
+			break;
+		}
+		/*else // to get some mat names
+		{
+			nadeName = mat->GetName();
+			nadeColor = Settings::ESP::flashbangColor.Color();
+			break;
+		}*/
 	}
 
 	DrawEntity(throwable, nadeName.c_str(), nadeColor);
@@ -1641,7 +1654,19 @@ void ESP::Paint()
 
 			DrawPlayer(player);
 		}
-		if ((client->m_ClassID != EClassIds::CBaseWeaponWorldModel && (strstr(client->m_pNetworkName, XORSTR("Weapon")) || client->m_ClassID == EClassIds::CDEagle || client->m_ClassID == EClassIds::CAK47 || client->m_ClassID == EClassIds::CBreachCharge || client->m_ClassID == EClassIds::CBumpMine)) && client->m_ClassID != EClassIds::CPhysPropWeaponUpgrade && Settings::ESP::Filters::weapons)
+		if ((client->m_ClassID != EClassIds::CBaseWeaponWorldModel && (strstr(client->m_pNetworkName, XORSTR("Weapon")) ||
+			client->m_ClassID == EClassIds::CDEagle ||
+			client->m_ClassID == EClassIds::CAK47 ||
+			client->m_ClassID == EClassIds::CMolotovGrenade ||
+			client->m_ClassID == EClassIds::CIncendiaryGrenade ||
+			client->m_ClassID == EClassIds::CSmokeGrenade ||
+			client->m_ClassID == EClassIds::CHEGrenade ||
+			client->m_ClassID == EClassIds::CFlashbang ||
+			client->m_ClassID == EClassIds::CDecoyGrenade ||
+			client->m_ClassID == EClassIds::CSensorGrenade || // TAGrenade
+			client->m_ClassID == EClassIds::CBreachCharge ||
+			client->m_ClassID == EClassIds::CBumpMine)) &&
+			client->m_ClassID != EClassIds::CPhysPropWeaponUpgrade && Settings::ESP::Filters::weapons)
 		{
 			DrawDroppedWeapons((C_BaseCombatWeapon*) entity, localplayer);
 		}
