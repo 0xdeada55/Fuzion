@@ -1347,7 +1347,7 @@ static void DrawDZItems(C_BaseEntity *item, C_BasePlayer* localplayer)
 		itemName = XORSTR("Briefcase");
 	else if (mdlName.find(XORSTR("parachutepack")) != mdlName.npos)
 		itemName = XORSTR("Parachute");
-	else if (mdlName.find(XORSTR("exojump")) != mdlName.npos) // TODO: not working.
+	else if (mdlName.find(XORSTR("exojump")) != mdlName.npos)
 		itemName = XORSTR("Exojump");
 	else
 		itemName = mdlName;

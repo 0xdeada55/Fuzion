@@ -8,6 +8,7 @@ bool Settings::ThirdPerson::enabled = false;
 float Settings::ThirdPerson::distance = 30.f;
 
 ShowedAngle Settings::ThirdPerson::type = ShowedAngle::REAL;
+ButtonCode_t Settings::ThirdPerson::key = ButtonCode_t::KEY_LALT;
 
 void ThirdPerson::OverrideView(CViewSetup *pSetup)
 {
@@ -15,6 +16,11 @@ void ThirdPerson::OverrideView(CViewSetup *pSetup)
 
 	if(!localplayer)
 		return;
+
+	static bool pressed = false, keyEnabled = false;
+	if (Settings::ThirdPerson::enabled && inputSystem->IsButtonDown(Settings::ThirdPerson::key) && !pressed)
+		keyEnabled ^= true;
+	pressed = inputSystem->IsButtonDown(Settings::ThirdPerson::key);
 
 	C_BaseCombatWeapon* activeWeapon = (C_BaseCombatWeapon*) entityList->GetClientEntityFromHandle(localplayer->GetActiveWeapon());
 
@@ -24,7 +30,7 @@ void ThirdPerson::OverrideView(CViewSetup *pSetup)
 		return;
 	}
 
-	if(localplayer->GetAlive() && Settings::ThirdPerson::enabled && !engine->IsTakingScreenshot())
+	if(localplayer->GetAlive() && Settings::ThirdPerson::enabled && !engine->IsTakingScreenshot() && keyEnabled)
 	{
 		QAngle viewAngles;
 		engine->GetViewAngles(viewAngles);
