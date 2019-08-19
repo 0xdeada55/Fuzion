@@ -587,6 +587,14 @@ static void DrawBox( ImColor color, int x, int y, int w, int h, C_BaseEntity* en
 }*/
 }
 
+// TODO: Fix this.
+/*static void DrawWeapon (HFont font, int x, int y, Color color, C_BasePlayer* player) // surface only
+{
+	C_BaseCombatWeapon* activeWeapon = (C_BaseCombatWeapon*)entityList->GetClientEntityFromHandle(player->GetActiveWeapon());
+	if (!activeWeapon) return;
+	Draw::Text(x, y, (const char*)&activeWeapon->GetCSWpnData()->iconInactive->cCharacterInFont, font, color);
+}*/
+
 static void DrawSprite( int x, int y, int w, int h, C_BaseEntity* entity ){
 	if ( Settings::ESP::Sprite::type == SpriteType::SPRITE_TUX ) {
 		static Texture sprite(tux_rgba, tux_width, tux_height);
