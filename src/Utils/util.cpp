@@ -103,7 +103,7 @@ std::string Util::WstringToString(std::wstring wstr)
 	{
 		return converter.to_bytes(wstr);
 	}
-	catch (std::range_error)
+	catch (std::range_error&)
 	{
 		std::stringstream s;
 		s << wstr.c_str();
@@ -119,7 +119,7 @@ std::wstring Util::StringToWstring(std::string str)
 	{
 		return converter.from_bytes(str);
 	}
-	catch (std::range_error)
+	catch (std::range_error&)
 	{
 		std::wostringstream s;
 		s << str.c_str();

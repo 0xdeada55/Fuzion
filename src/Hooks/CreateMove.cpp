@@ -24,6 +24,7 @@
 #include "../Hacks/tracereffect.h"
 #include "../Hacks/nofall.h"
 #include "../Hacks/quickswitch.h"
+#include "../Hacks/leftknife.h"
 
 bool CreateMove::sendPacket = true;
 QAngle CreateMove::lastTickViewAngles = QAngle(0, 0, 0);
@@ -65,6 +66,7 @@ bool Hooks::CreateMove(void* thisptr, float flInputSampleTime, CUserCmd* cmd)
 		ESP::CreateMove(cmd);
 		TracerEffect::CreateMove(cmd);
 		QuickSwitch::CreateMove(cmd);
+		LeftKnife::CreateMove(cmd);
 		PredictionSystem::EndPrediction();
 
 		EdgeJump::PostPredictionCreateMove(cmd);
