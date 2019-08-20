@@ -218,7 +218,7 @@ const char* ESP::dzRanks[] = {
 
 bool dzShouldDraw(C_BaseEntity* ent, C_BasePlayer* localplayer) // Ghetto way to fix a CTD.
 {
-	if (!localplayer || !ent || !localplayer->GetAlive())
+	if (!localplayer || !ent/* || !localplayer->GetAlive()*/)
 		return false;
 	return !(Settings::ESP::DangerZone::drawDistEnabled &&
 			(localplayer->GetVecOrigin().DistTo(ent->GetVecOrigin()) > Settings::ESP::DangerZone::drawDist));
@@ -590,11 +590,11 @@ static void DrawBox( ImColor color, int x, int y, int w, int h, C_BaseEntity* en
 }
 
 // TODO: Fix this.
-/*static void DrawWeapon (HFont font, int x, int y, Color color, C_BasePlayer* player) // surface only
+/*static void DrawWeapon(HFont font, int x, int y, Color color, C_BasePlayer* player) // surface only
 {
 	C_BaseCombatWeapon* activeWeapon = (C_BaseCombatWeapon*)entityList->GetClientEntityFromHandle(player->GetActiveWeapon());
 	if (!activeWeapon) return;
-	Draw::Text(x, y, (const char*)&activeWeapon->GetCSWpnData()->iconInactive->cCharacterInFont, font, color);
+	Draw::TextW(x, y, (const char*)&activeWeapon->GetCSWpnData()->iconInactive->cCharacterInFont, font, color);
 }*/
 
 static void DrawSprite( int x, int y, int w, int h, C_BaseEntity* entity ){
@@ -624,7 +624,7 @@ static void DrawEntity( C_BaseEntity* entity, const char* string, ImColor color,
 			std::string odist = "[";
 			odist += std::to_string(static_cast<int>(round(localplayer->GetVecOrigin().DistTo(entity->GetVecOrigin()))));
 			odist += "]";
-			Vector2D distSize = Draw::GetTextSize(odist.c_str(), esp_font);
+			//Vector2D distSize = Draw::GetTextSize(odist.c_str(), esp_font);
 			Draw::AddText(textX, textY + 14, odist.c_str(), Settings::ESP::entityDistanceColor.Color());
 		}
 	}
