@@ -252,6 +252,7 @@ void Settings::LoadDefaultsOrSave(std::string path)
 	settings[XORSTR("ESP")][XORSTR("enabled")] = Settings::ESP::enabled;
 	settings[XORSTR("ESP")][XORSTR("backend")] = (int)Settings::ESP::backend;
 	settings[XORSTR("ESP")][XORSTR("key")] = Util::GetButtonName(Settings::ESP::key);
+	settings[XORSTR("ESP")][XORSTR("entityDistance")] = (int)Settings::ESP::entityDistance;
 	LoadColor(settings[XORSTR("ESP")][XORSTR("enemy_color")], Settings::ESP::enemyColor);
 	LoadColor(settings[XORSTR("ESP")][XORSTR("enemy_visible_color")], Settings::ESP::enemyVisibleColor);
 	LoadColor(settings[XORSTR("ESP")][XORSTR("ally_color")], Settings::ESP::allyColor);
@@ -278,6 +279,7 @@ void Settings::LoadDefaultsOrSave(std::string path)
 	LoadColor(settings[XORSTR("ESP")][XORSTR("sonar_color")], Settings::ESP::sonarColor);
 	LoadColor(settings[XORSTR("ESP")][XORSTR("ally_info_color")], Settings::ESP::allyInfoColor);
 	LoadColor(settings[XORSTR("ESP")][XORSTR("enemy_info_color")], Settings::ESP::enemyInfoColor);
+	LoadColor(settings[XORSTR("ESP")][XORSTR("entity_distance_color")], Settings::ESP::entityDistanceColor);
 	settings[XORSTR("ESP")][XORSTR("Glow")][XORSTR("enabled")] = Settings::ESP::Glow::enabled;
 	LoadColor(settings[XORSTR("ESP")][XORSTR("Glow")][XORSTR("ally_color")], Settings::ESP::Glow::allyColor);
 	LoadColor(settings[XORSTR("ESP")][XORSTR("Glow")][XORSTR("enemy_color")], Settings::ESP::Glow::enemyColor);
@@ -775,6 +777,7 @@ void Settings::LoadConfig(std::string path)
 	GetVal(settings[XORSTR("ESP")][XORSTR("enabled")], &Settings::ESP::enabled);
 	GetVal(settings[XORSTR("ESP")][XORSTR("backend")], (int*)&Settings::ESP::backend);
 	GetButtonCode(settings[XORSTR("ESP")][XORSTR("key")], &Settings::ESP::key);
+	GetVal(settings[XORSTR("ESP")][XORSTR("entityDistance")], &Settings::ESP::entityDistance);
 	GetVal(settings[XORSTR("ESP")][XORSTR("enemy_color")], &Settings::ESP::enemyColor);
 	GetVal(settings[XORSTR("ESP")][XORSTR("enemy_visible_color")], &Settings::ESP::enemyVisibleColor);
 	GetVal(settings[XORSTR("ESP")][XORSTR("ally_color")], &Settings::ESP::allyColor);
@@ -801,6 +804,7 @@ void Settings::LoadConfig(std::string path)
 	GetVal(settings[XORSTR("ESP")][XORSTR("sonar_color")], &Settings::ESP::sonarColor);
 	GetVal(settings[XORSTR("ESP")][XORSTR("ally_info_color")], &Settings::ESP::allyInfoColor);
 	GetVal(settings[XORSTR("ESP")][XORSTR("enemy_info_color")], &Settings::ESP::enemyInfoColor);
+	GetVal(settings[XORSTR("ESP")][XORSTR("entity_distance_color")], &Settings::ESP::entityDistanceColor);
 	GetVal(settings[XORSTR("ESP")][XORSTR("Glow")][XORSTR("enabled")], &Settings::ESP::Glow::enabled);
 	GetVal(settings[XORSTR("ESP")][XORSTR("Glow")][XORSTR("ally_color")], &Settings::ESP::Glow::allyColor);
 	GetVal(settings[XORSTR("ESP")][XORSTR("Glow")][XORSTR("enemy_color")], &Settings::ESP::Glow::enemyColor);

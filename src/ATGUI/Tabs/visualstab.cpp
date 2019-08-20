@@ -100,6 +100,7 @@ void Visuals::RenderTab()
 				ImGui::ItemSize(ImVec2(0.0f, 0.0f), 0.0f);
 				ImGui::Checkbox(XORSTR("Bullet Tracers"), &Settings::ESP::BulletTracers::enabled);
 				ImGui::Checkbox(XORSTR("Head Dot"), &Settings::ESP::HeadDot::enabled);
+				ImGui::Checkbox(XORSTR("Show Entity Distance"), &Settings::ESP::entityDistance);
 			}
 			ImGui::NextColumn();
 			{
@@ -186,7 +187,6 @@ void Visuals::RenderTab()
 				ImGui::Checkbox(XORSTR("Hostages"), &Settings::ESP::Filters::hostages);
 			}
 			ImGui::Columns(1);
-
 			ImGui::Separator();
 			ImGui::Text(XORSTR("Danger Zone"));
 			ImGui::Separator();

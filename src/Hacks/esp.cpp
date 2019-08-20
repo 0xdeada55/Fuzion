@@ -20,6 +20,7 @@
 
 bool Settings::ESP::enabled = false;
 ButtonCode_t Settings::ESP::key = ButtonCode_t::KEY_Z;
+bool Settings::ESP::entityDistance = false;
 TeamColorType Settings::ESP::teamColorType = TeamColorType::RELATIVE;
 HealthColorVar Settings::ESP::enemyColor = ImColor(255, 0, 0, 255);
 HealthColorVar Settings::ESP::enemyVisibleColor = ImColor(255, 255, 0, 255);
@@ -51,6 +52,7 @@ ColorVar Settings::ESP::Skeleton::allyColor = ImColor(255, 255, 255, 255);
 ColorVar Settings::ESP::Skeleton::enemyColor = ImColor(255, 255, 255, 255);
 ColorVar Settings::ESP::Spread::color = ImColor(15, 200, 45, 255);
 ColorVar Settings::ESP::Spread::spreadLimitColor = ImColor(20, 5, 150, 255);
+ColorVar Settings::ESP::entityDistanceColor = ImColor(255, 255, 255, 255);
 bool Settings::ESP::Glow::enabled = false;
 HealthColorVar Settings::ESP::Glow::allyColor = ImColor(0, 0, 255, 255);
 HealthColorVar Settings::ESP::Glow::enemyColor = ImColor(255, 0, 0, 255);
@@ -604,15 +606,35 @@ static void DrawSprite( int x, int y, int w, int h, C_BaseEntity* entity ){
 	// TODO: Handle other sprites
 }
 
-static void DrawEntity( C_BaseEntity* entity, const char* string, ImColor color ) {
+static void DrawEntity( C_BaseEntity* entity, const char* string, ImColor color, ImColor txtcolor ) {
 	int x, y, w, h;
 	if ( !GetBox( entity, x, y, w, h ) )
 		return;
 
 	DrawBox( color, x, y, w, h, entity );
 	Vector2D nameSize = Draw::GetTextSize( string, esp_font );
-	Draw::AddText(( int ) ( x + ( w / 2 ) - ( nameSize.x / 2 ) ), y + h + 2, string, color );
+	int textX = x + (w / 2) - (nameSize.x / 2 ), textY = y + h + 2;
+	Draw::AddText(textX, textY, string, txtcolor );
+
+	if (Settings::ESP::entityDistance)
+	{
+		C_BasePlayer* localplayer = ( C_BasePlayer* ) entityList->GetClientEntity( engine->GetLocalPlayer() );
+		if (localplayer && entity/* && localplayer->GetAlive()*/)
+		{
+			std::string odist = "[";
+			odist += std::to_string(static_cast<int>(round(localplayer->GetVecOrigin().DistTo(entity->GetVecOrigin()))));
+			odist += "]";
+			Vector2D distSize = Draw::GetTextSize(odist.c_str(), esp_font);
+			Draw::AddText(textX, textY + 14, odist.c_str(), Settings::ESP::entityDistanceColor.Color());
+		}
+	}
 }
+
+static void DrawEntity(C_BaseEntity* entity, const char* string, ImColor color)
+{
+	DrawEntity(entity, string, color, color);
+}
+
 static void DrawSkeleton( C_BasePlayer* player, C_BasePlayer* localplayer ) {
 	studiohdr_t* pStudioModel = modelInfo->GetStudioModel( player->GetModel() );
 	if ( !pStudioModel )

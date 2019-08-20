@@ -619,6 +619,7 @@ namespace Settings
 		extern bool enabled;
         extern DrawingBackend backend;
 		extern ButtonCode_t key;
+		extern bool entityDistance;
 		extern TeamColorType teamColorType;
 		extern HealthColorVar enemyColor;
 		extern HealthColorVar allyColor;
@@ -646,6 +647,7 @@ namespace Settings
 		extern ColorVar allyInfoColor;
 		extern ColorVar enemyInfoColor;
 		extern HealthColorVar localplayerColor;
+		extern ColorVar entityDistanceColor;
 
 		namespace Glow
 		{
