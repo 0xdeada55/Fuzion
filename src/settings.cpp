@@ -147,6 +147,12 @@ void LoadColor(Json::Value &config, HealthColorVar color)
 	config[XORSTR("hp")] = color.hp;
 }
 
+// fixes a crash (see https://github.com/open-source-parsers/jsoncpp/blob/master/src/lib_json/json_value.cpp#L622)
+std::string LoadCString(Json::Value& config) // b1g fix
+{
+	return (config.isNull() ? "" : config.asCString());
+}
+
 void Settings::LoadDefaultsOrSave(std::string path)
 {
 	Json::Value settings;
@@ -207,6 +213,10 @@ void Settings::LoadDefaultsOrSave(std::string path)
 		weaponSetting[XORSTR("AutoSlow")][XORSTR("enabled")] = i.second.autoSlow;
 		weaponSetting[XORSTR("Prediction")][XORSTR("enabled")] = i.second.predEnabled;
 		weaponSetting[XORSTR("ScopeControl")][XORSTR("Enabled")] = i.second.scopeControlEnabled;
+
+		weaponSetting[XORSTR("BodyAim")][XORSTR("Enabled")] = i.second.bodyAimEnabled;
+		weaponSetting[XORSTR("BodyAim")][XORSTR("AimKey")] = Util::GetButtonName(i.second.baimkey);
+		weaponSetting[XORSTR("BodyAim")][XORSTR("Bone")] = (int) i.second.baimbone;
 
 		for (int bone = (int) DesiredBones::BONE_PELVIS; bone <= (int) DesiredBones::BONE_RIGHT_SOLE; bone++)
 			weaponSetting[XORSTR("DesiredBones")][XORSTR("Bones")][bone] = i.second.desiredBones[bone];
@@ -690,6 +700,9 @@ void Settings::LoadConfig(std::string path)
 		if (Settings::Aimbot::weapons.find(weaponID) == Settings::Aimbot::weapons.end())
 			Settings::Aimbot::weapons[weaponID] = AimbotWeapon_t();
 
+		if (weaponSetting[XORSTR( "BodyAim" )][XORSTR( "AimKey" )].empty())
+			return;
+
 		AimbotWeapon_t weapon = {
 				.enabled = weaponSetting[XORSTR( "Enabled" )].asBool(),
 				.silent = weaponSetting[XORSTR( "Silent" )].asBool(),
@@ -720,10 +733,14 @@ void Settings::LoadConfig(std::string path)
 				.predEnabled = weaponSetting[XORSTR( "Prediction" )][XORSTR( "enabled" )].asBool(),
 				.scopeControlEnabled = weaponSetting[XORSTR( "ScopeControl" )][XORSTR( "Enabled" )].asBool(),
 
+				.bodyAimEnabled = weaponSetting[XORSTR( "BodyAim" )][XORSTR( "Enabled" )].asBool(),
+				.baimkey = Util::GetButtonCode(LoadCString(weaponSetting[XORSTR( "BodyAim" )][XORSTR( "AimKey" )])),
+				.baimbone = (Bone) weaponSetting[XORSTR( "BodyAim" )][XORSTR( "Bone" )].asInt(),
+
 				.engageLockTTR = weaponSetting[XORSTR( "engageLockTTR" )].asInt(),
 				.bone = (Bone) weaponSetting[XORSTR( "TargetBone" )].asInt(),
 				.smoothType = (SmoothType) weaponSetting[XORSTR( "Smooth" )][XORSTR( "Type" )].asInt(),
-				.aimkey = Util::GetButtonCode(weaponSetting[XORSTR( "AimKey" )].asCString()),
+				.aimkey = Util::GetButtonCode(LoadCString(weaponSetting[XORSTR( "AimKey" )])),
 				.smoothAmount = weaponSetting[XORSTR( "Smooth" )][XORSTR( "Amount" )].asFloat(),
 				.smoothSaltMultiplier = weaponSetting[XORSTR( "Smooth" )][XORSTR( "Salting" )][XORSTR( "Multiplier" )].asFloat(),
 				.errorMarginValue = weaponSetting[XORSTR( "ErrorMargin" )][XORSTR( "Value" )].asFloat(),

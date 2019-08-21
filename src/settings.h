@@ -225,7 +225,10 @@ struct AimbotWeapon_t
 		 autoAimRealDistance,
 		 autoSlow,
 		 predEnabled,
-		 scopeControlEnabled;
+		 scopeControlEnabled,
+		 bodyAimEnabled;
+	ButtonCode_t baimkey = ButtonCode_t ::KEY_LSHIFT;
+	Bone baimbone = Bone::BONE_PELVIS;
 	int engageLockTTR = 700;
 	Bone bone = Bone::BONE_HEAD;
 	SmoothType smoothType = SmoothType::SLOW_END;
@@ -291,7 +294,10 @@ struct AimbotWeapon_t
 			this->autoSlow == another.autoSlow &&
 			this->predEnabled == another.predEnabled &&
 			this->autoAimRealDistance == another.autoAimRealDistance &&
-			this->scopeControlEnabled == another.scopeControlEnabled;
+			this->scopeControlEnabled == another.scopeControlEnabled &&
+			this->bodyAimEnabled == another.bodyAimEnabled &&
+			this->baimkey == another.baimkey &&
+			this->baimbone == another.baimbone;
 	}
 } const defaultSettings{};
 
@@ -539,6 +545,13 @@ namespace Settings
 		namespace ScopeControl
 		{
 			extern bool enabled;
+		}
+
+		namespace BodyAim
+		{
+			extern bool enabled;
+			extern ButtonCode_t key;
+			extern Bone bone;
 		}
 
 		extern std::unordered_map<ItemDefinitionIndex, AimbotWeapon_t, Util::IntHash<ItemDefinitionIndex>> weapons;

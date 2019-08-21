@@ -56,6 +56,10 @@ static bool autoSlow = false;
 static bool predEnabled = false;
 static bool scopeControlEnabled = false;
 
+static bool bodyAimEnabled = false;
+static ButtonCode_t baimkey = ButtonCode_t::KEY_LSHIFT;
+static Bone baimbone = Bone::BONE_PELVIS;
+
 void UI::ReloadWeaponSettings()
 {
 	ItemDefinitionIndex index = ItemDefinitionIndex::INVALID;
@@ -105,6 +109,10 @@ void UI::ReloadWeaponSettings()
 	predEnabled = Settings::Aimbot::weapons.at(index).predEnabled;
 	scopeControlEnabled = Settings::Aimbot::weapons.at(index).scopeControlEnabled;
 
+	bodyAimEnabled = Settings::Aimbot::weapons.at(index).bodyAimEnabled;
+	baimkey = Settings::Aimbot::weapons.at(index).baimkey;
+	baimbone = Settings::Aimbot::weapons.at(index).baimbone;
+
 	for (int bone = (int) DesiredBones::BONE_PELVIS; bone <= (int) DesiredBones::BONE_RIGHT_SOLE; bone++)
 		desiredBones[bone] = Settings::Aimbot::weapons.at(index).desiredBones[bone];
 }
@@ -143,6 +151,10 @@ void UI::UpdateWeaponSettings()
 			.autoSlow = autoSlow,
 			.predEnabled = predEnabled,
 			.scopeControlEnabled = scopeControlEnabled,
+
+			.bodyAimEnabled = bodyAimEnabled,
+			.baimkey = baimkey,
+			.baimbone = baimbone,
 
 			.engageLockTTR = engageLockTTR,
 			.bone = bone,
@@ -631,6 +643,24 @@ void Aimbot::RenderTab()
 				ImGui::PopItemWidth();
 			}
 
+			ImGui::Columns(1);
+			ImGui::Separator();
+			ImGui::Text(XORSTR("Body Aim"));
+			ImGui::Separator();
+			ImGui::Columns(2, nullptr, true);
+			{
+				if (ImGui::Checkbox(XORSTR("Enabled##BODYAIM"), &bodyAimEnabled))
+					UI::UpdateWeaponSettings();
+				ImGui::Text(XORSTR("Target Bone"));
+			}
+			ImGui::NextColumn();
+			{
+				UI::KeyBindButton(&baimkey);
+				ImGui::PushItemWidth(-1);
+				if (ImGui::Combo(XORSTR("##BAIMTARGET"), (int*)&baimbone, targets, IM_ARRAYSIZE(targets)))
+					UI::UpdateWeaponSettings();
+				ImGui::PopItemWidth();
+			}
 
 			ImGui::Columns(1);
 			ImGui::Separator();
