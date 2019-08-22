@@ -61,10 +61,6 @@ bool Settings::Aimbot::AutoSlow::goingToSlow = false;
 bool Settings::Aimbot::Prediction::enabled = false;
 bool Settings::Aimbot::ScopeControl::enabled = false;
 
-bool Settings::Aimbot::BodyAim::enabled = false;
-ButtonCode_t Settings::Aimbot::BodyAim::key = ButtonCode_t::KEY_LSHIFT;
-Bone Settings::Aimbot::BodyAim::bone = Bone::BONE_PELVIS;
-
 bool Aimbot::aimStepInProgress = false;
 std::vector<int64_t> Aimbot::friends = { };
 std::vector<long> killTimes = { 0 }; // the Epoch time from when we kill someone
@@ -217,13 +213,6 @@ static Vector VelocityExtrapolate(C_BasePlayer* player, Vector aimPos)
 	return aimPos + (player->GetVelocity() * globalVars->interval_per_tick);
 }
 
-int GetTargetBone() // ghetto baim
-{
-	if (Settings::Aimbot::BodyAim::enabled && inputSystem->IsButtonDown(Settings::Aimbot::BodyAim::key))
-		return (int)Settings::Aimbot::BodyAim::bone;
-	return (int)Settings::Aimbot::bone;
-}
-
 /* Original Credits to: https://github.com/goldenguy00 ( study! study! study! :^) ) */
 static Vector GetClosestSpot( CUserCmd* cmd, C_BasePlayer* localPlayer, C_BasePlayer* enemy, AimTargetType aimTargetType = AimTargetType::FOV)
 {
@@ -296,7 +285,7 @@ static C_BasePlayer* GetClosestPlayerAndSpot(CUserCmd* cmd, bool visibleCheck, V
 
 	if( lockedOn )
 	{
-		if( lockedOn->GetAlive() && !Settings::Aimbot::AutoAim::closestBone && !Entity::IsSpotVisibleThroughEnemies(lockedOn, lockedOn->GetBonePosition(GetTargetBone())) )
+		if( lockedOn->GetAlive() && !Settings::Aimbot::AutoAim::closestBone && !Entity::IsSpotVisibleThroughEnemies(lockedOn, lockedOn->GetBonePosition((int)Settings::Aimbot::bone)) )
 		{
 			lockedOn = nullptr;
 			return nullptr;
@@ -330,7 +319,7 @@ static C_BasePlayer* GetClosestPlayerAndSpot(CUserCmd* cmd, bool visibleCheck, V
 			}
 			else
 			{
-				*bestSpot = lockedOn->GetBonePosition(GetTargetBone());
+				*bestSpot = lockedOn->GetBonePosition((int)Settings::Aimbot::bone);
 			}
 
 			return lockedOn;
@@ -361,7 +350,7 @@ static C_BasePlayer* GetClosestPlayerAndSpot(CUserCmd* cmd, bool visibleCheck, V
 		}
 
 		Aimbot::targetAimbot = i;
-		Vector eVecTarget = player->GetBonePosition(GetTargetBone());
+		Vector eVecTarget = player->GetBonePosition((int) Settings::Aimbot::bone);
 		if( Settings::Aimbot::AutoAim::closestBone )
 		{
 			Vector tempSpot = GetClosestSpot(cmd, localplayer, player, aimTargetType);
@@ -934,9 +923,6 @@ void Aimbot::UpdateValues()
 	Settings::Aimbot::AutoWall::value = currentWeaponSetting.autoWallValue;
 	Settings::Aimbot::AutoSlow::enabled = currentWeaponSetting.autoSlow;
 	Settings::Aimbot::ScopeControl::enabled = currentWeaponSetting.scopeControlEnabled;
-	Settings::Aimbot::BodyAim::enabled = currentWeaponSetting.bodyAimEnabled;
-	Settings::Aimbot::BodyAim::key = currentWeaponSetting.baimkey;
-	Settings::Aimbot::BodyAim::bone = currentWeaponSetting.baimbone;
 
 	for (int bone = (int) DesiredBones::BONE_PELVIS; bone <= (int) DesiredBones::BONE_RIGHT_SOLE; bone++)
 		Settings::Aimbot::AutoAim::desiredBones[bone] = currentWeaponSetting.desiredBones[bone];
