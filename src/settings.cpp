@@ -652,9 +652,6 @@ void Settings::LoadDefaultsOrSave(std::string path)
 	// Debug cfgs
 	settings[XORSTR("Debug")][XORSTR("AutoWall")][XORSTR("debugView")] = Settings::Debug::AutoWall::debugView;
 	settings[XORSTR("Debug")][XORSTR("AutoAim")][XORSTR("drawTarget")] = Settings::Debug::AutoAim::drawTarget;
-	settings[XORSTR("Debug")][XORSTR("AutoAim")][XORSTR("target")][XORSTR("x")] = Settings::Debug::AutoAim::target.x;
-	settings[XORSTR("Debug")][XORSTR("AutoAim")][XORSTR("target")][XORSTR("y")] = Settings::Debug::AutoAim::target.y;
-	settings[XORSTR("Debug")][XORSTR("AutoAim")][XORSTR("target")][XORSTR("z")] = Settings::Debug::AutoAim::target.z;
 	settings[XORSTR("Debug")][XORSTR("BoneMap")][XORSTR("draw")] = Settings::Debug::BoneMap::draw;
 	settings[XORSTR("Debug")][XORSTR("BoneMap")][XORSTR("justDrawDots")] = Settings::Debug::BoneMap::justDrawDots;
 	settings[XORSTR("Debug")][XORSTR("AnimLayers")][XORSTR("draw")] = Settings::Debug::AnimLayers::draw;
@@ -1257,9 +1254,6 @@ void Settings::LoadConfig(std::string path)
 	// Debug cfgs
 	GetVal(settings[XORSTR("Debug")][XORSTR("AutoWall")][XORSTR("debugView")], &Settings::Debug::AutoWall::debugView);
 	GetVal(settings[XORSTR("Debug")][XORSTR("AutoAim")][XORSTR("drawTarget")], &Settings::Debug::AutoAim::drawTarget);
-	GetVal(settings[XORSTR("Debug")][XORSTR("AutoAim")][XORSTR("target")][XORSTR("x")], &Settings::Debug::AutoAim::target.x);
-	GetVal(settings[XORSTR("Debug")][XORSTR("AutoAim")][XORSTR("target")][XORSTR("y")], &Settings::Debug::AutoAim::target.y);
-	GetVal(settings[XORSTR("Debug")][XORSTR("AutoAim")][XORSTR("target")][XORSTR("z")], &Settings::Debug::AutoAim::target.z);
 	GetVal(settings[XORSTR("Debug")][XORSTR("BoneMap")][XORSTR("draw")], &Settings::Debug::BoneMap::draw);
 	GetVal(settings[XORSTR("Debug")][XORSTR("BoneMap")][XORSTR("justDrawDots")], &Settings::Debug::BoneMap::justDrawDots);
 	GetVal(settings[XORSTR("Debug")][XORSTR("AnimLayers")][XORSTR("draw")], &Settings::Debug::AnimLayers::draw);
