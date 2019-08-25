@@ -168,6 +168,9 @@ void Hitmarkers::FireGameEvent(IGameEvent* event)
 			case Sound::ORCHESTRAL:
 				engine->ClientCmd_Unrestrictedf( "playvol player\\orch_hit_csharp_short %f", Settings::ESP::Hitmarker::Sounds::volume ); // 0.8
 				break;
+			case Sound::GAMESENSE:
+				engine->ClientCmd_Unrestrictedf( "playvol buttons\\arena_switch_press_02 %f", Settings::ESP::Hitmarker::Sounds::volume );
+				break;
 			default:
 				break;
 		}

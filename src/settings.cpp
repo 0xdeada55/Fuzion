@@ -233,6 +233,8 @@ void Settings::LoadDefaultsOrSave(std::string path)
 
 	settings[XORSTR("Resolver")][XORSTR("resolve_all")] = Settings::Resolver::resolveAll;
 
+	settings[XORSTR("AngleIndicator")][XORSTR("enabled")] = Settings::AngleIndicator::enabled;
+
 	settings[XORSTR("Triggerbot")][XORSTR("enabled")] = Settings::Triggerbot::enabled;
 	settings[XORSTR("Triggerbot")][XORSTR("key")] = Util::GetButtonName(Settings::Triggerbot::key);
 	settings[XORSTR("Triggerbot")][XORSTR("Filters")][XORSTR("enemies")] = Settings::Triggerbot::Filters::enemies;
@@ -415,11 +417,14 @@ void Settings::LoadDefaultsOrSave(std::string path)
 		killSpammerMessages.append(it);
 	settings[XORSTR("Spammer")][XORSTR("KillSpammer")][XORSTR("messages")] = killSpammerMessages;
 
+	settings[XORSTR("Spammer")][XORSTR("RadioSpammer")][XORSTR("enabled")] = Settings::Spammer::RadioSpammer::enabled;
+
 	Json::Value normalSpammerMessages;
 	for (auto it : Settings::Spammer::NormalSpammer::messages)
 		normalSpammerMessages.append(it);
 	settings[XORSTR("Spammer")][XORSTR("NormalSpammer")][XORSTR("messages")] = normalSpammerMessages;
 
+	settings[XORSTR("Spammer")][XORSTR("PositionSpammer")][XORSTR("team")] = Settings::Spammer::PositionSpammer::team;
 	settings[XORSTR("Spammer")][XORSTR("PositionSpammer")][XORSTR("show_name")] = Settings::Spammer::PositionSpammer::showName;
 	settings[XORSTR("Spammer")][XORSTR("PositionSpammer")][XORSTR("show_weapon")] = Settings::Spammer::PositionSpammer::showWeapon;
 	settings[XORSTR("Spammer")][XORSTR("PositionSpammer")][XORSTR("show_rank")] = Settings::Spammer::PositionSpammer::showRank;
@@ -449,12 +454,15 @@ void Settings::LoadDefaultsOrSave(std::string path)
 	settings[XORSTR("Radar")][XORSTR("zoom")] = Settings::Radar::zoom;
 	settings[XORSTR("Radar")][XORSTR("enemies")] = Settings::Radar::enemies;
 	settings[XORSTR("Radar")][XORSTR("allies")] = Settings::Radar::allies;
+	settings[XORSTR("Radar")][XORSTR("bomb")] = Settings::Radar::bomb;
+	settings[XORSTR("Radar")][XORSTR("defuser")] = Settings::Radar::defuser;
 	settings[XORSTR("Radar")][XORSTR("legit")] = Settings::Radar::legit;
 	settings[XORSTR("Radar")][XORSTR("visibility_check")] = Settings::Radar::visibilityCheck;
 	settings[XORSTR("Radar")][XORSTR("smoke_check")] = Settings::Radar::smokeCheck;
 	settings[XORSTR("Radar")][XORSTR("InGame")][XORSTR("enabled")] = Settings::Radar::InGame::enabled;
 	settings[XORSTR("Radar")][XORSTR("pos")][XORSTR("x")] = Settings::Radar::pos.x;
 	settings[XORSTR("Radar")][XORSTR("pos")][XORSTR("y")] = Settings::Radar::pos.y;
+	settings[XORSTR("Radar")][XORSTR("color_type")] = (int) Settings::Radar::teamColorType;
 	LoadColor(settings[XORSTR("Radar")][XORSTR("enemy_color")], Settings::Radar::enemyColor);
 	LoadColor(settings[XORSTR("Radar")][XORSTR("enemy_visible_color")], Settings::Radar::enemyVisibleColor);
 	LoadColor(settings[XORSTR("Radar")][XORSTR("ally_color")], Settings::Radar::allyColor);
@@ -465,6 +473,7 @@ void Settings::LoadDefaultsOrSave(std::string path)
 	LoadColor(settings[XORSTR("Radar")][XORSTR("ct_visible_color")], Settings::Radar::ctVisibleColor);
 	LoadColor(settings[XORSTR("Radar")][XORSTR("bomb_color")], Settings::Radar::bombColor);
 	LoadColor(settings[XORSTR("Radar")][XORSTR("bomb_defusing_color")], Settings::Radar::bombDefusingColor);
+	LoadColor(settings[XORSTR("Radar")][XORSTR("defuser_color")], Settings::Radar::defuserColor);
 	settings[XORSTR("Radar")][XORSTR("icons_scale")] = Settings::Radar::iconsScale;
 
 	settings[XORSTR("Recoilcrosshair")][XORSTR("enabled")] = Settings::Recoilcrosshair::enabled;
@@ -640,6 +649,16 @@ void Settings::LoadDefaultsOrSave(std::string path)
 
 	settings[XORSTR("LeftKnife")][XORSTR("enabled")] = Settings::LeftKnife::enabled;
 
+	// Debug cfgs
+	settings[XORSTR("Debug")][XORSTR("AutoWall")][XORSTR("debugView")] = Settings::Debug::AutoWall::debugView;
+	settings[XORSTR("Debug")][XORSTR("AutoAim")][XORSTR("drawTarget")] = Settings::Debug::AutoAim::drawTarget;
+	settings[XORSTR("Debug")][XORSTR("AutoAim")][XORSTR("target")][XORSTR("x")] = Settings::Debug::AutoAim::target.x;
+	settings[XORSTR("Debug")][XORSTR("AutoAim")][XORSTR("target")][XORSTR("y")] = Settings::Debug::AutoAim::target.y;
+	settings[XORSTR("Debug")][XORSTR("AutoAim")][XORSTR("target")][XORSTR("z")] = Settings::Debug::AutoAim::target.z;
+	settings[XORSTR("Debug")][XORSTR("BoneMap")][XORSTR("draw")] = Settings::Debug::BoneMap::draw;
+	settings[XORSTR("Debug")][XORSTR("BoneMap")][XORSTR("justDrawDots")] = Settings::Debug::BoneMap::justDrawDots;
+	settings[XORSTR("Debug")][XORSTR("AnimLayers")][XORSTR("draw")] = Settings::Debug::AnimLayers::draw;
+
 	std::ofstream(path) << styledWriter.write(settings);
 }
 
@@ -757,6 +776,8 @@ void Settings::LoadConfig(std::string path)
 	GetVal(settings[XORSTR("AntiAim")][XORSTR("LBYBreaker")][XORSTR("offset")], &Settings::AntiAim::LBYBreaker::offset);
 
 	GetVal(settings[XORSTR("Resolver")][XORSTR("resolve_all")], &Settings::Resolver::resolveAll);
+
+	GetVal(settings[XORSTR("AngleIndicator")][XORSTR("enabled")], &Settings::AngleIndicator::enabled);
 
 	GetVal(settings[XORSTR("Triggerbot")][XORSTR("enabled")], &Settings::Triggerbot::enabled);
 	GetButtonCode(settings[XORSTR("Triggerbot")][XORSTR("key")], &Settings::Triggerbot::key);
@@ -939,12 +960,16 @@ void Settings::LoadConfig(std::string path)
 		for (const Json::Value& message : settings[XORSTR("Spammer")][XORSTR("KillSpammer")][XORSTR("messages")])
 			Settings::Spammer::KillSpammer::messages.push_back(message.asString());
 	}
+
+	GetVal(settings[XORSTR("Spammer")][XORSTR("RadioSpammer")][XORSTR("enabled")], &Settings::Spammer::RadioSpammer::enabled);
+
 	if (!settings[XORSTR("Spammer")][XORSTR("NormalSpammer")][XORSTR("messages")].isNull())
 	{
 		Settings::Spammer::NormalSpammer::messages.clear();
 		for (const Json::Value& message : settings[XORSTR("Spammer")][XORSTR("NormalSpammer")][XORSTR("messages")])
 			Settings::Spammer::NormalSpammer::messages.push_back(message.asString());
 	}
+	GetVal(settings[XORSTR("Spammer")][XORSTR("PositionSpammer")][XORSTR("team")], &Settings::Spammer::PositionSpammer::team);
 	GetVal(settings[XORSTR("Spammer")][XORSTR("PositionSpammer")][XORSTR("show_name")], &Settings::Spammer::PositionSpammer::showName);
 	GetVal(settings[XORSTR("Spammer")][XORSTR("PositionSpammer")][XORSTR("show_weapon")], &Settings::Spammer::PositionSpammer::showWeapon);
 	GetVal(settings[XORSTR("Spammer")][XORSTR("PositionSpammer")][XORSTR("show_rank")], &Settings::Spammer::PositionSpammer::showRank);
@@ -974,12 +999,15 @@ void Settings::LoadConfig(std::string path)
 	GetVal(settings[XORSTR("Radar")][XORSTR("zoom")], &Settings::Radar::zoom);
 	GetVal(settings[XORSTR("Radar")][XORSTR("enemies")], &Settings::Radar::enemies);
 	GetVal(settings[XORSTR("Radar")][XORSTR("allies")], &Settings::Radar::allies);
+	GetVal(settings[XORSTR("Radar")][XORSTR("bomb")], &Settings::Radar::bomb);
+	GetVal(settings[XORSTR("Radar")][XORSTR("defuser")], &Settings::Radar::defuser);
 	GetVal(settings[XORSTR("Radar")][XORSTR("legit")], &Settings::Radar::legit);
 	GetVal(settings[XORSTR("Radar")][XORSTR("visibility_check")], &Settings::Radar::visibilityCheck);
 	GetVal(settings[XORSTR("Radar")][XORSTR("smoke_check")], &Settings::Radar::smokeCheck);
 	GetVal(settings[XORSTR("Radar")][XORSTR("InGame")][XORSTR("enabled")], &Settings::Radar::InGame::enabled);
 	GetVal(settings[XORSTR("Radar")][XORSTR("pos")][XORSTR("x")], &Settings::Radar::pos.x);
 	GetVal(settings[XORSTR("Radar")][XORSTR("pos")][XORSTR("y")], &Settings::Radar::pos.y);
+	GetVal(settings[XORSTR("Radar")][XORSTR("color_type")], (int*)& Settings::Radar::teamColorType);
 	GetVal(settings[XORSTR("Radar")][XORSTR("enemy_color")], &Settings::Radar::enemyColor);
 	GetVal(settings[XORSTR("Radar")][XORSTR("enemy_visible_color")], &Settings::Radar::enemyVisibleColor);
 	GetVal(settings[XORSTR("Radar")][XORSTR("ally_color")], &Settings::Radar::allyColor);
@@ -990,6 +1018,7 @@ void Settings::LoadConfig(std::string path)
 	GetVal(settings[XORSTR("Radar")][XORSTR("ct_visible_color")], &Settings::Radar::ctVisibleColor);
 	GetVal(settings[XORSTR("Radar")][XORSTR("bomb_color")], &Settings::Radar::bombColor);
 	GetVal(settings[XORSTR("Radar")][XORSTR("bomb_defusing_color")], &Settings::Radar::bombDefusingColor);
+	GetVal(settings[XORSTR("Radar")][XORSTR("defuser_color")], &Settings::Radar::defuserColor);
 	GetVal(settings[XORSTR("Radar")][XORSTR("icons_scale")], &Settings::Radar::iconsScale);
 
 
@@ -1224,6 +1253,16 @@ void Settings::LoadConfig(std::string path)
 	GetVal(settings[XORSTR("QuickSwitch")][XORSTR("enabled")], &Settings::QuickSwitch::enabled);
 
 	GetVal(settings[XORSTR("LeftKnife")][XORSTR("enabled")], &Settings::LeftKnife::enabled);
+
+	// Debug cfgs
+	GetVal(settings[XORSTR("Debug")][XORSTR("AutoWall")][XORSTR("debugView")], &Settings::Debug::AutoWall::debugView);
+	GetVal(settings[XORSTR("Debug")][XORSTR("AutoAim")][XORSTR("drawTarget")], &Settings::Debug::AutoAim::drawTarget);
+	GetVal(settings[XORSTR("Debug")][XORSTR("AutoAim")][XORSTR("target")][XORSTR("x")], &Settings::Debug::AutoAim::target.x);
+	GetVal(settings[XORSTR("Debug")][XORSTR("AutoAim")][XORSTR("target")][XORSTR("y")], &Settings::Debug::AutoAim::target.y);
+	GetVal(settings[XORSTR("Debug")][XORSTR("AutoAim")][XORSTR("target")][XORSTR("z")], &Settings::Debug::AutoAim::target.z);
+	GetVal(settings[XORSTR("Debug")][XORSTR("BoneMap")][XORSTR("draw")], &Settings::Debug::BoneMap::draw);
+	GetVal(settings[XORSTR("Debug")][XORSTR("BoneMap")][XORSTR("justDrawDots")], &Settings::Debug::BoneMap::justDrawDots);
+	GetVal(settings[XORSTR("Debug")][XORSTR("AnimLayers")][XORSTR("draw")], &Settings::Debug::AnimLayers::draw);
 }
 
 void Settings::SaveGrenadeInfo(std::string path)

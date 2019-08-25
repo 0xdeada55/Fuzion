@@ -86,6 +86,7 @@ enum class Sound : int {
 	MEME,
 	ERROR,
 	ORCHESTRAL,
+	GAMESENSE,
 
 };
 
@@ -848,7 +849,7 @@ namespace Settings
 		}
 	}
 
-	namespace MaterialConfig {
+	namespace MaterialConfig { // not being saved nor loaded
 		extern bool enabled;
 		extern MaterialSystem_Config_t config;
 	}
