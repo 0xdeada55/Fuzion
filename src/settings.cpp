@@ -156,6 +156,7 @@ void Settings::LoadDefaultsOrSave(std::string path)
 	LoadColor(settings[XORSTR("UI")][XORSTR("bodyColor")], Settings::UI::bodyColor);
 	LoadColor(settings[XORSTR("UI")][XORSTR("fontColor")], Settings::UI::fontColor);
 	LoadColor(settings[XORSTR("UI")][XORSTR("accentColor")], Settings::UI::accentColor);
+	LoadColor(settings[XORSTR("UI")][XORSTR("watermarkColor")], Settings::UI::watermarkColor);
 	settings[XORSTR("UI")][XORSTR("Fonts")][XORSTR("ESP")][XORSTR("family")] = Settings::UI::Fonts::ESP::family;
 	settings[XORSTR("UI")][XORSTR("Fonts")][XORSTR("ESP")][XORSTR("size")] = Settings::UI::Fonts::ESP::size;
 	settings[XORSTR("UI")][XORSTR("Fonts")][XORSTR("ESP")][XORSTR("flags")] = Settings::UI::Fonts::ESP::flags;
@@ -676,6 +677,7 @@ void Settings::LoadConfig(std::string path)
 	GetVal(settings[XORSTR("UI")][XORSTR("bodyColor")], &Settings::UI::bodyColor);
 	GetVal(settings[XORSTR("UI")][XORSTR("fontColor")], &Settings::UI::fontColor);
 	GetVal(settings[XORSTR("UI")][XORSTR("accentColor")], &Settings::UI::accentColor);
+	GetVal(settings[XORSTR("UI")][XORSTR("watermarkColor")], &Settings::UI::watermarkColor);
 	GetVal(settings[XORSTR("UI")][XORSTR("Fonts")][XORSTR("ESP")][XORSTR("family")], &Settings::UI::Fonts::ESP::family);
 	GetVal(settings[XORSTR("UI")][XORSTR("Fonts")][XORSTR("ESP")][XORSTR("size")], &Settings::UI::Fonts::ESP::size);
 	GetVal(settings[XORSTR("UI")][XORSTR("Fonts")][XORSTR("ESP")][XORSTR("flags")], &Settings::UI::Fonts::ESP::flags);

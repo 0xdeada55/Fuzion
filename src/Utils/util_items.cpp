@@ -169,7 +169,6 @@ namespace Util
 				case ItemDefinitionIndex::WEAPON_MOLOTOV:
 				case ItemDefinitionIndex::WEAPON_SMOKEGRENADE:
 				case ItemDefinitionIndex::WEAPON_DECOY:
-
 				// DangerZone Update
 				case ItemDefinitionIndex::WEAPON_TAGRENADE:
 				case ItemDefinitionIndex::WEAPON_BREACHCHARGE:
@@ -249,6 +248,26 @@ namespace Util
 				case ItemDefinitionIndex::WEAPON_SCAR20:
 				case ItemDefinitionIndex::WEAPON_SG556:
 				case ItemDefinitionIndex::WEAPON_SSG08:
+					return true;
+				default:
+					return false;
+			}
+		}
+
+		bool IsPistol(ItemDefinitionIndex index)
+		{
+			switch (index)
+			{
+				case ItemDefinitionIndex::WEAPON_DEAGLE:
+				case ItemDefinitionIndex::WEAPON_ELITE:
+				case ItemDefinitionIndex::WEAPON_FIVESEVEN:
+				case ItemDefinitionIndex::WEAPON_GLOCK:
+				case ItemDefinitionIndex::WEAPON_TEC9:
+				case ItemDefinitionIndex::WEAPON_HKP2000:
+				case ItemDefinitionIndex::WEAPON_USP_SILENCER:
+				case ItemDefinitionIndex::WEAPON_P250:
+				case ItemDefinitionIndex::WEAPON_CZ75A:
+				case ItemDefinitionIndex::WEAPON_REVOLVER:
 					return true;
 				default:
 					return false;

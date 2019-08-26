@@ -61,6 +61,7 @@ void Colors::RenderWindow()
 			{ "UI Body", &Settings::UI::bodyColor },
 			{ "UI Font", &Settings::UI::fontColor },
 			{ "UI Accent", &Settings::UI::accentColor },
+			{ "Watermark", &Settings::UI::watermarkColor },
 			{ "FOV Circle", &Settings::ESP::FOVCrosshair::color },
 			{ "Spread", &Settings::ESP::Spread::color },
 			{ "SpreadLimit", &Settings::ESP::Spread::spreadLimitColor},

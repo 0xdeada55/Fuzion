@@ -21,6 +21,7 @@ ColorVar Settings::UI::mainColor = ImColor(25, 25, 25, 255);
 ColorVar Settings::UI::bodyColor = ImColor(5, 5, 5, 255);
 ColorVar Settings::UI::fontColor = ImColor(255, 255, 255, 255);
 ColorVar Settings::UI::accentColor = ImColor(39, 106, 219, 255);
+ColorVar Settings::UI::watermarkColor = ImColor(255, 255, 255, 255);
 /* Window Position/Size Defaults */
 int Settings::UI::Windows::Colors::sizeX = 540;
 int Settings::UI::Windows::Colors::sizeY = 325;
@@ -104,7 +105,7 @@ void UI::SwapWindow()
 	if (engine->IsInGame())
 		return;
 
-    Draw::ImText( ImVec2( 4.f, 4.f ), ImColor( 255, 255, 255, 255 ), XORSTR( "Fuzion" ), nullptr, 0.0f, nullptr,
+    Draw::ImText( ImVec2( 4.f, 4.f ), Settings::UI::watermarkColor.Color(), XORSTR( "Fuzion" ), nullptr, 0.0f, nullptr,
                   ImFontFlags_Shadow );
 }
 

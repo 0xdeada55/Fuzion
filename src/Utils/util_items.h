@@ -31,6 +31,7 @@ namespace Util
 		bool IsCTWeapon(ItemDefinitionIndex index);
 		bool IsTWeapon(ItemDefinitionIndex index);
 		bool IsScopeable(ItemDefinitionIndex index);
+		bool IsPistol(ItemDefinitionIndex index);
 		bool IsStuff(ItemDefinitionIndex index);
 	}
 }
