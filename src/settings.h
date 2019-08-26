@@ -1144,6 +1144,12 @@ namespace Settings
 	{
 		extern bool enabled;
 	}
+	
+	namespace DoorSpam
+	{
+		extern bool enabled;
+		extern ButtonCode_t key;
+	}
 
 	namespace DisablePostProcessing
 	{
