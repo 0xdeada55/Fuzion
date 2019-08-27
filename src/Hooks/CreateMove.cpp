@@ -25,6 +25,7 @@
 #include "../Hacks/nofall.h"
 #include "../Hacks/quickswitch.h"
 #include "../Hacks/leftknife.h"
+#include "../Hacks/clantagchanger.h"
 
 bool CreateMove::sendPacket = true;
 QAngle CreateMove::lastTickViewAngles = QAngle(0, 0, 0);
@@ -71,6 +72,7 @@ bool Hooks::CreateMove(void* thisptr, float flInputSampleTime, CUserCmd* cmd)
 
 		EdgeJump::PostPredictionCreateMove(cmd);
 		NoFall::PostPredictionCreateMove(cmd);
+		ClanTagChanger::CreateMove();
 
         *sendPacket = CreateMove::sendPacket;
 
