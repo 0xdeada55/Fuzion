@@ -423,6 +423,21 @@ void Misc::RenderTab()
 
 			ImGui::Columns(1);
 			ImGui::Separator();
+			ImGui::Text(XORSTR("FakeVote"));
+			ImGui::Separator();
+			ImGui::Columns(2, nullptr, true);
+			{
+				ImGui::Text(XORSTR("Message"));
+			}
+			ImGui::NextColumn();
+			{
+				ImGui::PushItemWidth(-1);
+				ImGui::InputText(XORSTR("##FAKEVOTEMSG"), Settings::FakeVote::message, 128);
+				ImGui::PopItemWidth();
+			}
+
+			ImGui::Columns(1);
+			ImGui::Separator();
 			ImGui::Text(XORSTR("Other"));
 			ImGui::Separator();
 			ImGui::Columns(2, nullptr, true);

@@ -568,6 +568,8 @@ void Settings::LoadDefaultsOrSave(std::string path)
 	settings[XORSTR("ClanTagChanger")][XORSTR("animation_speed")] = Settings::ClanTagChanger::animationSpeed;
 	settings[XORSTR("ClanTagChanger")][XORSTR("type")] = (int) Settings::ClanTagChanger::type;
 
+	settings[XORSTR("FakeVote")][XORSTR("message")] = Settings::FakeVote::message;
+
 	settings[XORSTR("View")][XORSTR("NoViewPunch")][XORSTR("enabled")] = Settings::View::NoViewPunch::enabled;
 	settings[XORSTR("View")][XORSTR("NoAimPunch")][XORSTR("enabled")] = Settings::View::NoAimPunch::enabled;
 
@@ -1169,6 +1171,8 @@ void Settings::LoadConfig(std::string path)
 	GetVal(settings[XORSTR("ClanTagChanger")][XORSTR("animation_speed")], &Settings::ClanTagChanger::animationSpeed);
 	GetVal(settings[XORSTR("ClanTagChanger")][XORSTR("type")], (int*)& Settings::ClanTagChanger::type);
 	::ClanTagChanger::UpdateClanTagCallback();
+
+	GetVal(settings[XORSTR("FakeVote")][XORSTR("message")], (char *)& Settings::FakeVote::message);
 
 	GetVal(settings[XORSTR("View")][XORSTR("NoViewPunch")][XORSTR("enabled")], &Settings::View::NoViewPunch::enabled);
 	GetVal(settings[XORSTR("View")][XORSTR("NoAimPunch")][XORSTR("enabled")], &Settings::View::NoAimPunch::enabled);
