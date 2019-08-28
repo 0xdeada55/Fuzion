@@ -1041,6 +1041,7 @@ namespace Settings
 	namespace FakeVote
 	{
 		extern char message[128];
+		extern char cmd[128]; // custom vote (doesn't being saved)
 	}
 
 	namespace View

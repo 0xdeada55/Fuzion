@@ -16,6 +16,7 @@
 #include "../../Hacks/namestealer.h"
 #include "../../Hacks/grenadehelper.h"
 #include "../../Hacks/clantagchanger.h"
+#include "../../Hacks/fakevote.h"
 #include "../../Hacks/valvedscheck.h"
 
 static char nickname[127] = "";
@@ -428,11 +429,14 @@ void Misc::RenderTab()
 			ImGui::Columns(2, nullptr, true);
 			{
 				ImGui::Text(XORSTR("Message"));
+				if (ImGui::Button(XORSTR("Call Vote"), ImVec2(-1, 0)))
+					FakeVote::CallVote(1, 0);
 			}
 			ImGui::NextColumn();
 			{
 				ImGui::PushItemWidth(-1);
 				ImGui::InputText(XORSTR("##FAKEVOTEMSG"), Settings::FakeVote::message, 128);
+				ImGui::InputText(XORSTR("##FAKEVOTECMD"), Settings::FakeVote::cmd, 128);
 				ImGui::PopItemWidth();
 			}
 

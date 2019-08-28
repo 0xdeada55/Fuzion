@@ -8,5 +8,5 @@ namespace FakeVote
 	//Hooks
 	void CreateMove(CUserCmd* cmd);
 	//void FireGameEvent(IGameEvent* event);
-	void Votekick(int userid);
+	void CallVote(int type, int userid);
 }

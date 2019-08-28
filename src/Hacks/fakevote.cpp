@@ -6,13 +6,15 @@
 #include "../interfaces.h"
 
 char Settings::FakeVote::message[128] = "Call timeout?";
+char Settings::FakeVote::cmd[128] = "swapteams";
 
 bool fakevote_enabled = false;
 int fakevote_id = -1;
 int fakevote_step = 0;
+int fakevote_type = 0;
 std::string oname = "invalid";
 
-static std::string GetLocalName()
+std::string GetLocalName()
 {
 	C_BasePlayer* localplayer = (C_BasePlayer*) entityList->GetClientEntity(engine->GetLocalPlayer());
 	if (!localplayer) return std::string("unconnected");
@@ -28,6 +30,13 @@ void CallVotekick(int userid)
 	engine->ClientCmd_Unrestricted(cmd.c_str());
 }
 
+void CallCustomVote(char* vote)
+{
+	std::string cmd = "callvote ";
+	cmd += vote;
+	engine->ClientCmd_Unrestricted(cmd.c_str());
+}
+
 void CallSpoofname()
 {
 	std::string name = "";
@@ -37,12 +46,16 @@ void CallSpoofname()
 	NameChanger::SetName(name.c_str());
 }
 
-void FakeVote::Votekick(int userid)
+void FakeVote::CallVote(int type, int userid)
 {
+	if (fakevote_enabled)
+		return;
+	
 	oname = GetLocalName();
 	NameChanger::SetName(XORSTR("\n\xAD\xAD\xAD"));
 	fakevote_step = 0;
 	fakevote_id = userid;
+	fakevote_type = type;
 	fakevote_enabled = true;
 	return;
 }
@@ -81,7 +94,10 @@ void FakeVote::CreateMove(CUserCmd* cmd)
 		case 2:
 		{
 			fakevote_step++;
-			CallVotekick(fakevote_id);
+			if (fakevote_type == 0)
+				CallVotekick(fakevote_id);
+			else
+				CallCustomVote(Settings::FakeVote::cmd);
 			break;
 		}
 		case 3:

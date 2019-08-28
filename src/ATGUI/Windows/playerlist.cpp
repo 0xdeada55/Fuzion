@@ -227,7 +227,7 @@ void PlayerList::RenderWindow()
 						}
 
 						if (ImGui::Button(XORSTR("Fake Votekick (delayed)")))
-							FakeVote::Votekick(entityInformation.userid);
+							FakeVote::CallVote(0, entityInformation.userid);
 					}
 				}
 				ImGui::EndChild();
