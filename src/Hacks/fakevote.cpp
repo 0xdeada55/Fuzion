@@ -9,7 +9,7 @@ char Settings::FakeVote::message[128] = "Call timeout?";
 
 bool fakevote_enabled = false;
 int fakevote_id = -1;
-int step = 0;
+int fakevote_step = 0;
 std::string oname = "invalid";
 
 static std::string GetLocalName()
@@ -22,20 +22,10 @@ static std::string GetLocalName()
 	return std::string(playerInfo.name);
 }
 
-/*void CallVote(std::string vote) // TODO: Other votes.
-{
-	std::ostringstream voteCommand;
-	voteCommand << XORSTR("callvote ");
-	voteCommand << vote;
-	engine->ClientCmd_Unrestricted(voteCommand.str().c_str());
-}*/
-
 void CallVotekick(int userid)
 {
-	std::ostringstream votekickCommand;
-	votekickCommand << XORSTR("callvote Kick ");
-	votekickCommand << userid;
-	engine->ClientCmd_Unrestricted(votekickCommand.str().c_str());
+	std::string cmd = "callvote Kick " + std::to_string(userid);
+	engine->ClientCmd_Unrestricted(cmd.c_str());
 }
 
 void CallSpoofname()
@@ -51,6 +41,7 @@ void FakeVote::Votekick(int userid)
 {
 	oname = GetLocalName();
 	NameChanger::SetName(XORSTR("\n\xAD\xAD\xAD"));
+	fakevote_step = 0;
 	fakevote_id = userid;
 	fakevote_enabled = true;
 	return;
@@ -62,42 +53,57 @@ void FakeVote::CreateMove(CUserCmd* cmd)
 		return;
 
 	C_BasePlayer* localplayer = (C_BasePlayer*) entityList->GetClientEntity(engine->GetLocalPlayer());
-	if (!localplayer/* || !localplayer->GetAlive()*/)
+	if (!localplayer)
 		return;
 
 	float currentTime = globalVars->curtime;
-	static float timeStamp = currentTime - 1; // - 1 seg (wait for glitch name)
+	static float timeStamp = currentTime;
 
-	if (currentTime - timeStamp > 1 && step == 0)
-	{
-		timeStamp = currentTime;
-		step = 1;
-		NameChanger::SetName(XORSTR("\n\xAD\xAD\xAD"));
-	}
-	if (currentTime - timeStamp > 1 && step == 1)
-	{
-		timeStamp = currentTime;
-		step = 2;
-		CallSpoofname();
-	}
-	else if (currentTime - timeStamp > 1 && step == 2)
-	{
-		timeStamp = currentTime;
-		step = 3;
-		CallVotekick(fakevote_id);
-	}
-	else if (currentTime - timeStamp > 1 && step == 3)
-	{
-		timeStamp = currentTime;
-		step = 4;
-		NameChanger::SetName(oname.c_str());
-	}
+	if (currentTime - timeStamp < 1)
+		return;
 
-	if (step == 4)
+	timeStamp = currentTime;
+
+	switch (fakevote_step)
 	{
-		step = 0;
-		fakevote_id = -1;
-		fakevote_enabled = false;
+		case 0:
+		{
+			fakevote_step++;
+			NameChanger::SetName(XORSTR("\n\xAD\xAD\xAD")); // re-glitch just to be sure.
+			break;
+		}
+		case 1:
+		{
+			fakevote_step++;
+			CallSpoofname();
+			break;
+		}
+		case 2:
+		{
+			fakevote_step++;
+			CallVotekick(fakevote_id);
+			break;
+		}
+		case 3:
+		{
+			fakevote_step++;
+			NameChanger::SetName(oname.c_str());
+			break;
+		}
+		case 4:
+		{
+			fakevote_step = 0;
+			fakevote_id = -1;
+			fakevote_enabled = false;
+			break;
+		}
+		default: // very impossible
+		{
+			fakevote_step = 0;
+			fakevote_id = -1;
+			fakevote_enabled = false;
+			cvar->ConsoleDPrintf("[FAKEVOTE] switch() statment returned default. Fake Vote cancelled.\n");
+		}
 	}
 }
 

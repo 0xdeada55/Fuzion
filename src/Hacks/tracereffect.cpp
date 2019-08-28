@@ -96,7 +96,7 @@ void TracerEffect::RestoreTracers( )
     {
         CCSWeaponInfo *swag = (CCSWeaponInfo*)tracerRecords[i].address;
         *swag->GetTracerFrequency() = tracerRecords[i].frequency;
-        memcpy(swag->GetTracerEffect(), tracerRecords[i].effectName, strlen(tracerRecords[i].effectName));
+        strncpy(swag->GetTracerEffect(), tracerRecords[i].effectName, strlen(tracerRecords[i].effectName));
     }
     tracerRecords.clear();
 }
