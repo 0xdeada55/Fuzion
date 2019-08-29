@@ -5,7 +5,7 @@
 #include "../settings.h"
 #include "../interfaces.h"
 
-char Settings::FakeVote::message[128] = "Call timeout?";
+char Settings::FakeVote::message[128] = "Call a timeout?";
 char Settings::FakeVote::cmd[128] = "swapteams";
 
 bool fakevote_enabled = false;
@@ -50,7 +50,7 @@ void FakeVote::CallVote(int type, int userid)
 {
 	if (fakevote_enabled)
 		return;
-	
+
 	oname = GetLocalName();
 	NameChanger::SetName(XORSTR("\n\xAD\xAD\xAD"));
 	fakevote_step = 0;
