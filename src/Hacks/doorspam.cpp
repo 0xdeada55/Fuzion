@@ -5,7 +5,7 @@
 
 bool Settings::DoorSpam::enabled = false;
 static bool ShouldSpamDoors = false;
-ButtonCode_t Settings::DoorSpam::key = ButtonCode_t::KEY_H;
+ButtonCode_t Settings::DoorSpam::key = ButtonCode_t::KEY_E;
 
 void DoorSpam::CreateMove(CUserCmd* cmd)
 {
@@ -16,12 +16,27 @@ void DoorSpam::CreateMove(CUserCmd* cmd)
 	if (!localplayer)
 		return;
 
-	if (inputSystem->IsButtonDown(Settings::DoorSpam::key)){		
-		if (ShouldSpamDoors){
-			cmd->buttons &= ~IN_USE;
-		} else {
-			cmd->buttons |= IN_USE;			
+	if (inputSystem->IsButtonDown(Settings::DoorSpam::key)){	
+
+		for (int i = 1; i < entityList->GetHighestEntityIndex(); i++)
+		{			
+			C_BaseEntity* entity = entityList->GetClientEntity(i);
+			if (!entity)
+				continue;
+
+			ClientClass* client = entity->GetClientClass();
+
+			if (client->m_ClassID == EClassIds::CPropDoorRotating){
+				if (localplayer->GetVecOrigin().DistTo(entity->GetVecOrigin()) < 100){
+					if (ShouldSpamDoors){
+						cmd->buttons &= ~IN_USE;
+					} else {
+						cmd->buttons |= IN_USE;				
+					}
+					ShouldSpamDoors = !ShouldSpamDoors;	
+				}
+			}
 		}
-		ShouldSpamDoors = !ShouldSpamDoors;	
+
 	}
 }
