@@ -451,12 +451,12 @@ void Misc::RenderTab()
 				ImGui::Checkbox(XORSTR("Auto Accept"), &Settings::AutoAccept::enabled);
 				ImGui::Checkbox(XORSTR("AirStuck"), &Settings::Airstuck::enabled);
 				ImGui::Checkbox(XORSTR("Autoblock"), &Settings::Autoblock::enabled);
-				ImGui::Checkbox(XORSTR("Jump Throw"), &Settings::JumpThrow::enabled);
-				ImGui::Checkbox(XORSTR("Door Spam"), &Settings::DoorSpam::enabled);				
+				ImGui::Checkbox(XORSTR("Jump Throw"), &Settings::JumpThrow::enabled);				
 				ImGui::Checkbox(XORSTR("Auto Defuse"), &Settings::AutoDefuse::enabled);
 				ImGui::Checkbox(XORSTR("Left Handed Knife"), &Settings::LeftKnife::enabled);
 				ImGui::Checkbox(XORSTR("Disable post-processing"), &Settings::DisablePostProcessing::enabled);
 				ImGui::Checkbox(XORSTR("No Duck Cooldown"), &Settings::NoDuckCooldown::enabled);
+				ImGui::Checkbox(XORSTR("Door Spam"), &Settings::DoorSpam::enabled);
 			}
 			ImGui::NextColumn();
 			{
@@ -468,7 +468,6 @@ void Misc::RenderTab()
 				UI::KeyBindButton(&Settings::Airstuck::key);
 				UI::KeyBindButton(&Settings::Autoblock::key);
 				UI::KeyBindButton(&Settings::JumpThrow::key);
-				UI::KeyBindButton(&Settings::DoorSpam::key);				
 				ImGui::Checkbox(XORSTR("Silent Defuse"), &Settings::AutoDefuse::silent);
 				ImGui::Checkbox(XORSTR("Attempt NoFall"), &Settings::NoFall::enabled);
 				ImGui::Checkbox(XORSTR("AWP Quick Switch"), &Settings::QuickSwitch::enabled);
