@@ -1153,7 +1153,7 @@ namespace Settings
 	{
 		extern bool enabled;
 	}
-
+  
 	namespace NoFall
 	{
 		extern bool enabled;
