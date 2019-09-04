@@ -1140,12 +1140,22 @@ namespace Settings
 		extern ButtonCode_t key;
 	}
 
-	namespace NoFall
+	namespace ProfileChanger
+	{
+		extern int coinID;
+		extern int musicID;
+		extern int compRank;
+		extern int weaponStatus;
+		extern int weaponRarity;
+	}
+
+	namespace DoorSpam
 	{
 		extern bool enabled;
+		extern ButtonCode_t key;
 	}
 	
-	namespace DoorSpam
+	namespace NoFall
 	{
 		extern bool enabled;
 		extern ButtonCode_t key;
