@@ -8,6 +8,8 @@ bool Settings::FakeLag::enabled = false;
 int Settings::FakeLag::value = 9;
 bool Settings::FakeLag::adaptive = false;
 
+bool FakeLag::lagSpike = false;
+
 static int ticks = 0;
 int ticksMax = 16;
 
@@ -17,10 +19,10 @@ void FakeLag::CreateMove(CUserCmd* cmd)
 		return;
 
 	C_BasePlayer* localplayer = (C_BasePlayer*) entityList->GetClientEntity(engine->GetLocalPlayer());
-	if (!localplayer || !localplayer->GetAlive())
+	if (Settings::AntiAim::Fake::enabled && localplayer->GetVelocity().Length() <= 0.0f)
 		return;
 
-	if (localplayer->GetFlags() & FL_ONGROUND && Settings::FakeLag::adaptive)
+	if (!localplayer || !localplayer->GetAlive())
 		return;
 
 	if (cmd->buttons & IN_ATTACK)
@@ -33,6 +35,10 @@ void FakeLag::CreateMove(CUserCmd* cmd)
 	{
 		CreateMove::sendPacket = true;
 		ticks = 0;
+	}
+	else if (Settings::FakeLag::adaptive && FakeLag::lagSpike)
+	{
+		CreateMove::sendPacket = false;
 	}
 	else
 	{
