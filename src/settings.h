@@ -152,7 +152,7 @@ enum class ShowedAngle : int
     FAKE,
 };
 
-enum class AntiAimType_Y : int
+enum class AntiAimYaw_Real : int
 {
 	SPIN_SLOW,
 	SPIN_FAST,
@@ -166,6 +166,7 @@ enum class AntiAimType_Y : int
 	STATICAA,
 	STATICJITTER,
 	STATICSMALLJITTER,
+	FOLLOW,
 	CASUAL,
 	LISP,
 	LISP_SIDE,
@@ -177,11 +178,12 @@ enum class AntiAimType_Y : int
 	LBYONGROUND,
 };
 
-enum class AntiAimType_Fake : int
+enum class AntiAimYaw_Fake: int
 {
 	STATIC_LEFT,
 	STATIC_RIGHT,
-	JITTER
+	JITTER,
+	MANUAL
 };
 
 enum class AntiAimType_X : int
@@ -214,6 +216,7 @@ struct AimbotWeapon_t
 		 rcsEnabled,
 		 rcsAlwaysOn,
 		 spreadLimitEnabled,
+		 hitChanceEnabled,
 		 autoPistolEnabled,
 		 autoShootEnabled,
 		 autoScopeEnabled,
@@ -240,7 +243,8 @@ struct AimbotWeapon_t
 		  rcsAmountX = 2.0f,
 		  rcsAmountY = 2.0f,
 		  autoWallValue = 10.0f,
-		  spreadLimit = 1.0f;
+		  spreadLimit = 1.0f,
+		  hitChance = 80.0f;
 	bool desiredBones[31];
 
 	bool operator == (const AimbotWeapon_t& another) const
@@ -287,6 +291,8 @@ struct AimbotWeapon_t
 			this->flashCheck == another.flashCheck &&
 			this->spreadLimitEnabled == another.spreadLimitEnabled &&
 			this->spreadLimit == another.spreadLimit &&
+			this->hitChanceEnabled == another.hitChanceEnabled &&
+			this->hitChance == another.hitChance &&
 			this->autoWallEnabled == another.autoWallEnabled &&
 			this->autoWallValue == another.autoWallValue &&
 			this->autoSlow == another.autoSlow &&
@@ -533,6 +539,12 @@ namespace Settings
 			extern float value;
 		}
 
+		namespace HitChance
+		{
+			extern bool enabled;
+			extern float value;
+		}
+
 		namespace Prediction
 		{
 			extern bool enabled;
@@ -585,13 +597,19 @@ namespace Settings
         namespace Yaw
         {
             extern bool enabled;
-            extern AntiAimType_Y type;
+            extern AntiAimYaw_Real type;
+            extern float offset;
         }
 
 		namespace Fake
 		{
 			extern bool enabled;
-			extern AntiAimType_Fake type;
+			extern AntiAimYaw_Fake type;
+		}
+		
+		namespace RageDesyncFix
+		{
+			extern bool enabled;
 		}
 
         namespace Pitch
@@ -604,10 +622,12 @@ namespace Settings
         {
             extern bool enabled;
         }
+
         namespace LBYBreaker
         {
             extern bool enabled;
             extern float offset;
+            extern bool manual;
         }
     }
 
@@ -810,6 +830,11 @@ namespace Settings
 			extern bool enabled;
 			extern float size;
 		}
+		
+		namespace backtrack
+		{
+			extern bool enabled;
+		}
 
 		namespace Spread
 		{
@@ -926,6 +951,11 @@ namespace Settings
 	}
 
 	namespace NoDuckCooldown
+	{
+		extern bool enabled;
+	}
+
+	namespace LagComp
 	{
 		extern bool enabled;
 	}

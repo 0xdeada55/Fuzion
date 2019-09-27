@@ -29,6 +29,12 @@ void ThirdPerson::OverrideView(CViewSetup *pSetup)
 		input->m_fCameraInThirdPerson = false;
 		return;
 	}
+	static bool keywasup = false;
+	if(inputSystem->IsButtonDown(Settings::ThirdPerson::key) && !keywasup)
+	{
+		Settings::ThirdPerson::enabled = !Settings::ThirdPerson::enabled;
+	}
+	keywasup = inputSystem->IsButtonDown(Settings::ThirdPerson::key);
 
 	if(localplayer->GetAlive() && Settings::ThirdPerson::enabled && !engine->IsTakingScreenshot() && keyEnabled)
 	{

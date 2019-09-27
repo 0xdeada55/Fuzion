@@ -1,5 +1,7 @@
 #include "chams.h"
 
+#include "lagcomp.h"
+
 #include "../Utils/xorstring.h"
 #include "../Utils/entity.h"
 #include "../settings.h"
@@ -125,6 +127,33 @@ static void DrawPlayer(void* thisptr, void* context, void *state, const ModelRen
 	// No need to call DME again, it already gets called in DrawModelExecute.cpp
 }
 
+static void DrawRecord(void* thisptr, void* context, void *state, const ModelRenderInfo_t &pInfo, matrix3x4_t* pCustomBoneToWorld)
+{
+	if (!Settings::LagComp::enabled)
+        return;
+
+    C_BasePlayer* localplayer = (C_BasePlayer*) entityList->GetClientEntity(engine->GetLocalPlayer());
+	if (!localplayer)
+		return;
+	if (LagComp::ticks.empty())
+		return;
+
+ 	IMaterial* visible_material = materialChams;
+ 	Color visColor = Color(255, 0, 0, 255);
+ 	visible_material->ColorModulate(visColor);
+ 	visible_material->AlphaModulate(0.2f);
+	auto &tick = LagComp::ticks.back();
+	for (auto &record : tick.records)
+	{
+		if (!record.boneMatrix)
+			continue;
+
+		(Vector)pInfo.origin = record.origin;
+		modelRender->ForcedMaterialOverride(visible_material);
+		modelRenderVMT->GetOriginalMethod<DrawModelExecuteFn>(21)(thisptr, context, state, pInfo, (matrix3x4_t*)record.boneMatrix);
+	}
+}
+
 static void DrawWeapon(const ModelRenderInfo_t& pInfo)
 {
 	if (!Settings::ESP::Chams::Weapon::enabled)
@@ -188,8 +217,10 @@ void Chams::DrawModelExecute(void* thisptr, void* context, void *state, const Mo
 
 	std::string modelName = modelInfo->GetModelName(pInfo.pModel);
 
-	if (modelName.find(XORSTR("models/player")) != std::string::npos)
+	if (modelName.find(XORSTR("models/player")) != std::string::npos){
+		// DrawRecord(thisptr, context, state, pInfo, pCustomBoneToWorld);
 		DrawPlayer(thisptr, context, state, pInfo, pCustomBoneToWorld);
+	}
 	else if (modelName.find(XORSTR("arms")) != std::string::npos)
 		DrawArms(pInfo);
 	else if (modelName.find(XORSTR("weapon")) != std::string::npos)
