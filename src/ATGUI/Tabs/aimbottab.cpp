@@ -198,7 +198,7 @@ void Aimbot::RenderTab()
 			if (!isDefault && !Util::Contains(Util::ToLower(std::string(filterWeapons)), Util::ToLower(Util::Items::GetItemDisplayName(it.first).c_str())))
 				continue;
 
-			if (Util::Items::IsKnife(it.first) || Util::Items::IsGlove(it.first) || Util::Items::IsUtility(it.first))
+			if (Util::Items::IsKnife(it.first) || Util::Items::IsGlove(it.first) || Util::Items::IsUtility(it.first) || Util::Items::IsStuff(it.first))
 				continue;
 
 			const bool item_selected = ((int) it.first == (int) currentWeapon);
@@ -463,26 +463,11 @@ void Aimbot::RenderTab()
 			ImGui::Columns(2, nullptr, true);
 			{
 
-				switch (currentWeapon)
+				if (currentWeapon == ItemDefinitionIndex::INVALID || Util::Items::IsPistol(currentWeapon))
 				{
-					case ItemDefinitionIndex::INVALID:
-					case ItemDefinitionIndex::WEAPON_DEAGLE:
-					case ItemDefinitionIndex::WEAPON_ELITE:
-					case ItemDefinitionIndex::WEAPON_FIVESEVEN:
-					case ItemDefinitionIndex::WEAPON_GLOCK:
-					case ItemDefinitionIndex::WEAPON_TEC9:
-					case ItemDefinitionIndex::WEAPON_HKP2000:
-					case ItemDefinitionIndex::WEAPON_USP_SILENCER:
-					case ItemDefinitionIndex::WEAPON_P250:
-					case ItemDefinitionIndex::WEAPON_CZ75A:
-					case ItemDefinitionIndex::WEAPON_REVOLVER:
-						if (ImGui::Checkbox(XORSTR("Auto Pistol"), &autoPistolEnabled))
-							UI::UpdateWeaponSettings();
-						break;
-					default:
-						break;
+					if (ImGui::Checkbox(XORSTR("Auto Pistol"), &autoPistolEnabled))
+						UI::UpdateWeaponSettings();
 				}
-
 				if (ImGui::Checkbox(XORSTR("Silent Aim"), &silent))
 					UI::UpdateWeaponSettings();
 				if (ImGui::Checkbox(XORSTR("Smoke Check"), &smokeCheck))
@@ -495,24 +480,12 @@ void Aimbot::RenderTab()
 				if (ImGui::Checkbox(XORSTR("No Shoot"), &noShootEnabled))
 					UI::UpdateWeaponSettings();
 
-				switch (currentWeapon)
+				if (currentWeapon == ItemDefinitionIndex::INVALID || Util::Items::IsScopeable(currentWeapon))
 				{
-					case ItemDefinitionIndex::WEAPON_DEAGLE:
-					case ItemDefinitionIndex::WEAPON_ELITE:
-					case ItemDefinitionIndex::WEAPON_FIVESEVEN:
-					case ItemDefinitionIndex::WEAPON_GLOCK:
-					case ItemDefinitionIndex::WEAPON_TEC9:
-					case ItemDefinitionIndex::WEAPON_HKP2000:
-					case ItemDefinitionIndex::WEAPON_USP_SILENCER:
-					case ItemDefinitionIndex::WEAPON_P250:
-					case ItemDefinitionIndex::WEAPON_CZ75A:
-					case ItemDefinitionIndex::WEAPON_REVOLVER:
-						break;
-					default:
-						if (ImGui::Checkbox(XORSTR("Auto Scope"), &autoScopeEnabled))
-							UI::UpdateWeaponSettings();
-						if (ImGui::Checkbox(XORSTR("Scope Control"), &scopeControlEnabled))
-							UI::UpdateWeaponSettings();
+					if (ImGui::Checkbox(XORSTR("Auto Scope"), &autoScopeEnabled))
+						UI::UpdateWeaponSettings();
+					if (ImGui::Checkbox(XORSTR("Scope Control"), &scopeControlEnabled))
+						UI::UpdateWeaponSettings();
 				}
 
 				if (ImGui::Checkbox(XORSTR("Flash Check"), &flashCheck))

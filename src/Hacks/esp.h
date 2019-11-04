@@ -10,6 +10,7 @@
 namespace ESP
 {
 	extern const char* ranks[];
+	extern const char* dzRanks[];
 
 	ImColor GetESPPlayerColor(C_BasePlayer* player, bool visible);
 	bool WorldToScreen( const Vector &origin, ImVec2 * const screen );

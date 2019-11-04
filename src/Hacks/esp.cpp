@@ -20,6 +20,7 @@
 
 bool Settings::ESP::enabled = false;
 ButtonCode_t Settings::ESP::key = ButtonCode_t::KEY_Z;
+bool Settings::ESP::entityDistance = false;
 TeamColorType Settings::ESP::teamColorType = TeamColorType::RELATIVE;
 HealthColorVar Settings::ESP::enemyColor = ImColor(255, 0, 0, 255);
 HealthColorVar Settings::ESP::enemyVisibleColor = ImColor(255, 255, 0, 255);
@@ -44,12 +45,14 @@ ColorVar Settings::ESP::grenadeColor = ImColor(244, 67, 54, 255);
 ColorVar Settings::ESP::molotovColor = ImColor(205, 32, 31, 255);
 ColorVar Settings::ESP::mineColor = ImColor(205, 32, 31, 255);
 ColorVar Settings::ESP::chargeColor = ImColor(205, 32, 31, 255);
+ColorVar Settings::ESP::sonarColor = ImColor(205, 32, 31, 255);
 ColorVar Settings::ESP::allyInfoColor = ImColor(255, 255, 255, 255);
 ColorVar Settings::ESP::enemyInfoColor = ImColor(255, 255, 255, 255);
 ColorVar Settings::ESP::Skeleton::allyColor = ImColor(255, 255, 255, 255);
 ColorVar Settings::ESP::Skeleton::enemyColor = ImColor(255, 255, 255, 255);
 ColorVar Settings::ESP::Spread::color = ImColor(15, 200, 45, 255);
 ColorVar Settings::ESP::Spread::spreadLimitColor = ImColor(20, 5, 150, 255);
+ColorVar Settings::ESP::entityDistanceColor = ImColor(255, 255, 255, 255);
 bool Settings::ESP::Glow::enabled = false;
 HealthColorVar Settings::ESP::Glow::allyColor = ImColor(0, 0, 255, 255);
 HealthColorVar Settings::ESP::Glow::enemyColor = ImColor(255, 0, 0, 255);
@@ -194,9 +197,28 @@ const char* ESP::ranks[] = {
 		"The Global Elite"
 };
 
+const char* ESP::dzRanks[] = {
+		"Unranked",
+		"Lab Rat I",
+		"Lab Rat II",
+		"Sprinting Hare I",
+		"Sprinting Hare II",
+		"Wild Scout I",
+		"Wild Scout II",
+		"Wild Scout Elite",
+		"Hunter Fox I",
+		"Hunter Fox II",
+		"Hunter Fox III",
+		"Hunter Fox Elite",
+		"Timber Wolf",
+		"Ember Wolf",
+		"Wildfire Wolf",
+		"The Howling Alpha"
+};
+
 bool dzShouldDraw(C_BaseEntity* ent, C_BasePlayer* localplayer) // Ghetto way to fix a CTD.
 {
-	if (!localplayer || !ent || !localplayer->GetAlive())
+	if (!localplayer || !ent/* || !localplayer->GetAlive()*/)
 		return false;
 	return !(Settings::ESP::DangerZone::drawDistEnabled &&
 			(localplayer->GetVecOrigin().DistTo(ent->GetVecOrigin()) > Settings::ESP::DangerZone::drawDist));
@@ -567,6 +589,14 @@ static void DrawBox( ImColor color, int x, int y, int w, int h, C_BaseEntity* en
 }*/
 }
 
+// TODO: Fix this.
+/*static void DrawWeapon(HFont font, int x, int y, Color color, C_BasePlayer* player) // surface only
+{
+	C_BaseCombatWeapon* activeWeapon = (C_BaseCombatWeapon*)entityList->GetClientEntityFromHandle(player->GetActiveWeapon());
+	if (!activeWeapon) return;
+	Draw::TextW(x, y, (const char*)&activeWeapon->GetCSWpnData()->iconInactive->cCharacterInFont, font, color);
+}*/
+
 static void DrawSprite( int x, int y, int w, int h, C_BaseEntity* entity ){
 	if ( Settings::ESP::Sprite::type == SpriteType::SPRITE_TUX ) {
 		static Texture sprite(tux_rgba, tux_width, tux_height);
@@ -576,15 +606,35 @@ static void DrawSprite( int x, int y, int w, int h, C_BaseEntity* entity ){
 	// TODO: Handle other sprites
 }
 
-static void DrawEntity( C_BaseEntity* entity, const char* string, ImColor color ) {
+static void DrawEntity( C_BaseEntity* entity, const char* string, ImColor color, ImColor txtcolor ) {
 	int x, y, w, h;
 	if ( !GetBox( entity, x, y, w, h ) )
 		return;
 
 	DrawBox( color, x, y, w, h, entity );
 	Vector2D nameSize = Draw::GetTextSize( string, esp_font );
-	Draw::AddText(( int ) ( x + ( w / 2 ) - ( nameSize.x / 2 ) ), y + h + 2, string, color );
+	int textX = x + (w / 2) - (nameSize.x / 2 ), textY = y + h + 2;
+	Draw::AddText(textX, textY, string, txtcolor );
+
+	if (Settings::ESP::entityDistance)
+	{
+		C_BasePlayer* localplayer = ( C_BasePlayer* ) entityList->GetClientEntity( engine->GetLocalPlayer() );
+		if (localplayer && entity/* && localplayer->GetAlive()*/)
+		{
+			std::string odist = "[";
+			odist += std::to_string(static_cast<int>(round(localplayer->GetVecOrigin().DistTo(entity->GetVecOrigin()))));
+			odist += "]";
+			//Vector2D distSize = Draw::GetTextSize(odist.c_str(), esp_font);
+			Draw::AddText(textX, textY + 14, odist.c_str(), Settings::ESP::entityDistanceColor.Color());
+		}
+	}
 }
+
+static void DrawEntity(C_BaseEntity* entity, const char* string, ImColor color)
+{
+	DrawEntity(entity, string, color, color);
+}
+
 static void DrawSkeleton( C_BasePlayer* player, C_BasePlayer* localplayer ) {
 	studiohdr_t* pStudioModel = modelInfo->GetStudioModel( player->GetModel() );
 	if ( !pStudioModel )
@@ -922,8 +972,8 @@ static void DrawPlayerText( C_BasePlayer* player, C_BasePlayer* localplayer, int
 		int rank = *( *csPlayerResource )->GetCompetitiveRanking( player->GetIndex() );
 
 		if ( rank >= 0 && rank < 19 ) {
-			Vector2D rankSize = Draw::GetTextSize( ESP::ranks[rank], esp_font );
-			Draw::AddText( ( x + ( w / 2 ) - ( rankSize.x / 2 ) ), ( y - ( textSize.y * lineNum ) - nameOffset ), ESP::ranks[rank], Entity::IsTeamMate(player, localplayer) ? Settings::ESP::allyInfoColor.Color() : Settings::ESP::enemyInfoColor.Color() );
+			Vector2D rankSize = Draw::GetTextSize( (Util::IsDangerZone() ? ESP::dzRanks[rank] : ESP::ranks[rank]), esp_font );
+			Draw::AddText( ( x + ( w / 2 ) - ( rankSize.x / 2 ) ), ( y - ( textSize.y * lineNum ) - nameOffset ), (Util::IsDangerZone() ? ESP::dzRanks[rank] : ESP::ranks[rank]), Entity::IsTeamMate(player, localplayer) ? Settings::ESP::allyInfoColor.Color() : Settings::ESP::enemyInfoColor.Color() );
 		}
 	}
 
@@ -1319,7 +1369,7 @@ static void DrawDZItems(C_BaseEntity *item, C_BasePlayer* localplayer)
 		itemName = XORSTR("Briefcase");
 	else if (mdlName.find(XORSTR("parachutepack")) != mdlName.npos)
 		itemName = XORSTR("Parachute");
-	else if (mdlName.find(XORSTR("exojump")) != mdlName.npos) // TODO: not working.
+	else if (mdlName.find(XORSTR("exojump")) != mdlName.npos)
 		itemName = XORSTR("Exojump");
 	else
 		itemName = mdlName;
@@ -1400,6 +1450,18 @@ static void DrawThrowable(C_BaseEntity* throwable, ClientClass* client, C_BasePl
 			nadeColor = Settings::ESP::chargeColor.Color();
 			break;
 		}
+		else if (strstr(mat->GetName(), XORSTR("sonar_bomb"))) // tagrenade
+		{
+			nadeName = XORSTR("TA Grenade (placed)");
+			nadeColor = Settings::ESP::sonarColor.Color();
+			break;
+		}
+		/*else // to get some mat names
+		{
+			nadeName = mat->GetName();
+			nadeColor = Settings::ESP::flashbangColor.Color();
+			break;
+		}*/
 	}
 
 	DrawEntity(throwable, nadeName.c_str(), nadeColor);
@@ -1622,7 +1684,19 @@ void ESP::Paint()
 
 			DrawPlayer(player);
 		}
-		if ((client->m_ClassID != EClassIds::CBaseWeaponWorldModel && (strstr(client->m_pNetworkName, XORSTR("Weapon")) || client->m_ClassID == EClassIds::CDEagle || client->m_ClassID == EClassIds::CAK47 || client->m_ClassID == EClassIds::CBreachCharge || client->m_ClassID == EClassIds::CBumpMine)) && client->m_ClassID != EClassIds::CPhysPropWeaponUpgrade && Settings::ESP::Filters::weapons)
+		if ((client->m_ClassID != EClassIds::CBaseWeaponWorldModel && (strstr(client->m_pNetworkName, XORSTR("Weapon")) ||
+			client->m_ClassID == EClassIds::CDEagle ||
+			client->m_ClassID == EClassIds::CAK47 ||
+			client->m_ClassID == EClassIds::CMolotovGrenade ||
+			client->m_ClassID == EClassIds::CIncendiaryGrenade ||
+			client->m_ClassID == EClassIds::CSmokeGrenade ||
+			client->m_ClassID == EClassIds::CHEGrenade ||
+			client->m_ClassID == EClassIds::CFlashbang ||
+			client->m_ClassID == EClassIds::CDecoyGrenade ||
+			client->m_ClassID == EClassIds::CSensorGrenade || // TAGrenade
+			client->m_ClassID == EClassIds::CBreachCharge ||
+			client->m_ClassID == EClassIds::CBumpMine)) &&
+			client->m_ClassID != EClassIds::CPhysPropWeaponUpgrade && Settings::ESP::Filters::weapons)
 		{
 			DrawDroppedWeapons((C_BaseCombatWeapon*) entity, localplayer);
 		}

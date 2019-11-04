@@ -16,6 +16,7 @@ namespace Hooks
 	float GetViewModelFOV(void* thisptr);
 
 	/* GameEvents */
+	bool FireEvent(void* thisptr, IGameEvent* event, bool bDontBroadcast);
 	bool FireEventClientSide(void* thisptr, IGameEvent* event);
 
 	/* Input Internal */

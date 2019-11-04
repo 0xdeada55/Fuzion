@@ -565,7 +565,20 @@ public:
 	}
 };
 
-class CHudTexture;
+class CHudTexture
+{
+public:
+	char	szShortName[64];
+	char	szTextureFile[64];
+	bool	bRenderUsingFont;
+	bool	bPrecached;
+	char	cCharacterInFont;
+	unsigned char	pad_0x0083;
+	int		hFont;
+	int		iTextureId;
+	float	afTexCoords[4];
+	int		iPosX[4];
+};
 
 class FileWeaponInfo_t
 {

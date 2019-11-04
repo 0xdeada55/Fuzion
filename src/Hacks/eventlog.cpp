@@ -20,8 +20,8 @@ ColorVar Settings::Eventlog::color = ImColor( 255, 79, 56, 255 );
 
 void Eventlog::Paint( ) {
 	if ( !Settings::ESP::enabled )
-		return;	
-	
+		return;
+
 	if ( !Settings::Eventlog::showEnemies && !Settings::Eventlog::showTeammates && !Settings::Eventlog::showLocalplayer )
 		return;
 
@@ -74,8 +74,8 @@ void Eventlog::Paint( ) {
 void Eventlog::FireGameEvent(IGameEvent* event)
 {
 	if (!Settings::ESP::enabled)
-		return;	
-	
+		return;
+
 	if (!Settings::Eventlog::showEnemies && !Settings::Eventlog::showTeammates && !Settings::Eventlog::showLocalplayer)
 		return;
 
@@ -117,17 +117,17 @@ void Eventlog::FireGameEvent(IGameEvent* event)
 		if ((engine->GetPlayerForUserID(hurt_player_id) == engine->GetLocalPlayer() && (engine->GetPlayerForUserID(attacker_id) != engine->GetLocalPlayer()))){
 			damageLog += XORSTR(" from ");
 
-			IEngineClient::player_info_t damageFromPlayer;		
+			IEngineClient::player_info_t damageFromPlayer;
 			engine->GetPlayerInfo(engine->GetPlayerForUserID(attacker_id), &damageFromPlayer);
-			damageLog += std::string(damageFromPlayer.name);			
+			damageLog += std::string(damageFromPlayer.name);
 		} else if ((engine->GetPlayerForUserID(hurt_player_id) != engine->GetLocalPlayer() && (engine->GetPlayerForUserID(attacker_id) == engine->GetLocalPlayer()))){
 			damageLog += XORSTR(" to ");
 
-			IEngineClient::player_info_t damageToPlayer;		
+			IEngineClient::player_info_t damageToPlayer;
 			engine->GetPlayerInfo(engine->GetPlayerForUserID(hurt_player_id), &damageToPlayer);
-			damageLog += std::string(damageToPlayer.name);			
+			damageLog += std::string(damageToPlayer.name);
 		}
-		
+
 		if ((hurt_player->GetHealth()) - (event->GetInt(XORSTR("dmg_health"))) <= 0){
 			damageLog += XORSTR(" (dead)");
 		} else if ((hurt_player->GetHealth()) - (event->GetInt(XORSTR("dmg_health"))) > 0){
@@ -156,7 +156,7 @@ void Eventlog::FireGameEvent(IGameEvent* event)
 			return;
 
 
-		IEngineClient::player_info_t buyerInformation;		
+		IEngineClient::player_info_t buyerInformation;
 		engine->GetPlayerInfo(engine->GetPlayerForUserID(buyer_player_id), &buyerInformation);
 
 		long now = Util::GetEpochTime();
@@ -165,11 +165,11 @@ void Eventlog::FireGameEvent(IGameEvent* event)
 		std::string boughtLog = std::string(buyerInformation.name);
 		boughtLog += XORSTR(" bought ");
 
-		std::string deletefromname = "weapon_";
-		std::string weaponname = event->GetString(XORSTR("weapon"));
-		std::string::size_type whereisstring = weaponname.find(deletefromname);
-		weaponname.erase(whereisstring, deletefromname.length());
-		boughtLog += weaponname;		
+		std::string weaponname = event->GetString(XORSTR("weapon")); // 'item' for items ?
+		std::size_t found = weaponname.find('_');
+		if (found != std::string::npos)
+			weaponname.erase(0, found+1);
+		boughtLog += weaponname;
 
 		logToShow.insert(logToShow.begin(), std::pair<std::string, long>(boughtLog, now));
 
@@ -194,7 +194,7 @@ void Eventlog::FireGameEvent(IGameEvent* event)
 		if (!event->GetBool("hasbomb"))
 			return;
 
-		IEngineClient::player_info_t bomberInformation;		
+		IEngineClient::player_info_t bomberInformation;
 		engine->GetPlayerInfo(engine->GetPlayerForUserID(bomb_player_id), &bomberInformation);
 
 		long now = Util::GetEpochTime();
@@ -223,7 +223,7 @@ void Eventlog::FireGameEvent(IGameEvent* event)
 			return;
 
 
-		IEngineClient::player_info_t defuserInformation;		
+		IEngineClient::player_info_t defuserInformation;
 		engine->GetPlayerInfo(engine->GetPlayerForUserID(defuse_player_id), &defuserInformation);
 
 		long now = Util::GetEpochTime();
@@ -240,8 +240,8 @@ void Eventlog::FireGameEvent(IGameEvent* event)
 
 		logToShow.insert(logToShow.begin(), std::pair<std::string, long>(defuseLog, now));
 
-	} else if (strstr(event->GetName(), XORSTR("bomb_beginplant"))){ 
-		//To add: check on which bomb-site is player planting 
+	} else if (strstr(event->GetName(), XORSTR("bomb_beginplant"))){
+		//To add: check on which bomb-site is player planting
 
 		int plant_player_id = event->GetInt(XORSTR("userid"));
 
@@ -259,7 +259,7 @@ void Eventlog::FireGameEvent(IGameEvent* event)
 			return;
 
 
-		IEngineClient::player_info_t planterInformation;		
+		IEngineClient::player_info_t planterInformation;
 		engine->GetPlayerInfo(engine->GetPlayerForUserID(plant_player_id), &planterInformation);
 
 		long now = Util::GetEpochTime();
@@ -271,7 +271,7 @@ void Eventlog::FireGameEvent(IGameEvent* event)
 
 		logToShow.insert(logToShow.begin(), std::pair<std::string, long>(plantLog, now));
 
-	} else if (strstr(event->GetName(), XORSTR("item_pickup"))){ 
+	} else if (strstr(event->GetName(), XORSTR("item_pickup"))){
 
 		int pickup_player_id = event->GetInt(XORSTR("userid"));
 
@@ -289,7 +289,7 @@ void Eventlog::FireGameEvent(IGameEvent* event)
 			return;
 
 
-		IEngineClient::player_info_t pickupInformation;		
+		IEngineClient::player_info_t pickupInformation;
 		engine->GetPlayerInfo(engine->GetPlayerForUserID(pickup_player_id), &pickupInformation);
 
 		long now = Util::GetEpochTime();
@@ -301,7 +301,7 @@ void Eventlog::FireGameEvent(IGameEvent* event)
 
 		logToShow.insert(logToShow.begin(), std::pair<std::string, long>(pickupLog, now));
 
-	} else if (strstr(event->GetName(), XORSTR("item_remove"))){ 
+	} else if (strstr(event->GetName(), XORSTR("item_remove"))){
 
 		int drop_player_id = event->GetInt(XORSTR("userid"));
 
@@ -321,7 +321,7 @@ void Eventlog::FireGameEvent(IGameEvent* event)
 		if (strstr(event->GetString(XORSTR("item")), XORSTR("knife")) || strstr(event->GetString(XORSTR("item")), XORSTR("vesthelm")))
 			return;
 
-		IEngineClient::player_info_t dropInformation;		
+		IEngineClient::player_info_t dropInformation;
 		engine->GetPlayerInfo(engine->GetPlayerForUserID(drop_player_id), &dropInformation);
 
 		long now = Util::GetEpochTime();

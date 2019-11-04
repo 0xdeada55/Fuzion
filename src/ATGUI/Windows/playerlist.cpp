@@ -10,6 +10,7 @@
 #include "../../Hacks/resolver.h"
 #include "../../Hacks/clantagchanger.h"
 #include "../../Hacks/namechanger.h"
+#include "../../Hacks/fakevote.h"
 
 #pragma GCC diagnostic ignored "-Wformat-security"
 
@@ -52,7 +53,7 @@ void PlayerList::RenderWindow()
 		if (!engine->IsInGame() || (*csPlayerResource && !(*csPlayerResource)->GetConnected(currentPlayer)))
 			currentPlayer = -1;
 
-		ImGui::ListBoxHeader(XORSTR("##PLAYERS"), ImVec2(-1, (ImGui::GetWindowSize().y - 95)));
+		ImGui::ListBoxHeader(XORSTR("##PLAYERS"), ImVec2(-1, (ImGui::GetWindowSize().y - 155)));
 		if (engine->IsInGame() && *csPlayerResource)
 		{
 			ImGui::Columns(8);
@@ -151,7 +152,7 @@ void PlayerList::RenderWindow()
 					ImGui::Text("%d/%d/%d", (*csPlayerResource)->GetKills(it),(*csPlayerResource)->GetAssists(it), (*csPlayerResource)->GetDeaths(it));
 					ImGui::NextColumn();
 
-					ImGui::Text("%s", ESP::ranks[*(*csPlayerResource)->GetCompetitiveRanking(it)]);
+					ImGui::Text("%s", (Util::IsDangerZone() ? ESP::dzRanks[*(*csPlayerResource)->GetCompetitiveRanking(it)] : ESP::ranks[*(*csPlayerResource)->GetCompetitiveRanking(it)]));
 					ImGui::NextColumn();
 
 					ImGui::Text("%d", *(*csPlayerResource)->GetCompetitiveWins(it));
@@ -163,69 +164,80 @@ void PlayerList::RenderWindow()
 
 		if (currentPlayer != -1)
 		{
-			IEngineClient::player_info_t entityInformation;
-			engine->GetPlayerInfo(currentPlayer, &entityInformation);
-
-			ImGui::Columns(3);
+			C_BasePlayer* localplayer = (C_BasePlayer*) entityList->GetClientEntity(engine->GetLocalPlayer());
+			ImGui::BeginChild(XORSTR("FOOT1"), ImVec2(0, 120), true);
 			{
-				bool isFriendly = std::find(Aimbot::friends.begin(), Aimbot::friends.end(), entityInformation.xuid) != Aimbot::friends.end();
-				if (ImGui::Checkbox(XORSTR("Friend"), &isFriendly))
-				{
-					if (isFriendly)
-						Aimbot::friends.push_back(entityInformation.xuid);
-					else
-						Aimbot::friends.erase(std::find(Aimbot::friends.begin(), Aimbot::friends.end(), entityInformation.xuid));
-				}
+				IEngineClient::player_info_t entityInformation;
+				engine->GetPlayerInfo(currentPlayer, &entityInformation);
 
-				bool shouldResolve = std::find(Resolver::Players.begin(), Resolver::Players.end(), entityInformation.xuid) != Resolver::Players.end();
-				if (ImGui::Checkbox(XORSTR("Resolver"), &shouldResolve))
+				ImGui::Text(XORSTR("Player Actions"));
+				ImGui::Separator();
+				ImGui::Columns(3);
 				{
-					if (shouldResolve)
-						Resolver::Players.push_back(entityInformation.xuid);
-					else
-						Resolver::Players.erase(std::find(Resolver::Players.begin(), Resolver::Players.end(), entityInformation.xuid));
-				}
-			}
-			ImGui::NextColumn();
-			{
-				if (ImGui::Button(XORSTR("Steal name")))
-				{
-					std::string name(entityInformation.name);
-					name = Util::PadStringRight(name, name.length() + 1);
+					bool isFriendly = std::find(Aimbot::friends.begin(), Aimbot::friends.end(), entityInformation.xuid) != Aimbot::friends.end();
+					if (ImGui::Checkbox(XORSTR("Friend"), &isFriendly))
+					{
+						if (isFriendly)
+							Aimbot::friends.push_back(entityInformation.xuid);
+						else
+							Aimbot::friends.erase(std::find(Aimbot::friends.begin(), Aimbot::friends.end(), entityInformation.xuid));
+					}
 
-					strcpy(nickname, name.c_str());
-					NameChanger::SetName(Util::PadStringRight(name, name.length() + 1));
-				}
+					bool shouldResolve = std::find(Resolver::Players.begin(), Resolver::Players.end(), entityInformation.xuid) != Resolver::Players.end();
+					if (ImGui::Checkbox(XORSTR("Resolver"), &shouldResolve))
+					{
+						if (shouldResolve)
+							Resolver::Players.push_back(entityInformation.xuid);
+						else
+							Resolver::Players.erase(std::find(Resolver::Players.begin(), Resolver::Players.end(), entityInformation.xuid));
+					}
 
-				if (ImGui::Button(XORSTR("Votekick")))
-				{
-					std::string cmd;
-					//													userid
-					cmd.reserve((sizeof("callvote kick ") / sizeof("")) + 3);
-					cmd.append(XORSTR("callvote kick "));
-					cmd.append(std::to_string(entityInformation.userid));
-					engine->ClientCmd_Unrestricted(cmd.c_str());
-				}
+					ImGui::NextColumn();
+					{
+						if (ImGui::Button(XORSTR("Steal name")))
+						{
+							std::string name(entityInformation.name);
+							name = Util::PadStringRight(name, name.length() + 1);
 
-				const char* clanTag = (*csPlayerResource)->GetClan(currentPlayer);
-				if (clanTag && clanTag[0] && ImGui::Button(XORSTR("Steal clan tag")))
-				{
-					Settings::ClanTagChanger::enabled = true;
-					strcpy(Settings::ClanTagChanger::value, clanTag);
-					Settings::ClanTagChanger::type = ClanTagType::STATIC;
+							strcpy(nickname, name.c_str());
+							NameChanger::SetName(Util::PadStringRight(name, name.length() + 1));
+						}
 
-					ClanTagChanger::UpdateClanTagCallback();
+						const char* clanTag = (*csPlayerResource)->GetClan(currentPlayer);
+						if (clanTag && clanTag[0] && ImGui::Button(XORSTR("Steal clan tag")))
+						{
+							Settings::ClanTagChanger::enabled = true;
+							strcpy(Settings::ClanTagChanger::value, clanTag);
+							Settings::ClanTagChanger::type = ClanTagType::STATIC;
+
+							ClanTagChanger::UpdateClanTagCallback();
+						}
+					}
+					ImGui::NextColumn();
+					{
+						if (ImGui::Button(XORSTR("Print information")))
+							cvar->ConsoleColorPrintf(ColorRGBA(255, 255, 255), XORSTR("\n=====\nPlayer informations:\n[%s] %s \nSteamID: %s\n=====\n"),(*csPlayerResource)->GetClan(currentPlayer), entityInformation.name, entityInformation.guid);
+
+						if (localplayer && (*csPlayerResource)->GetTeam(currentPlayer) == localplayer->GetTeam())
+						{
+							if (ImGui::Button(XORSTR("Votekick")))
+							{
+								std::string cmd;
+								//													userid
+								cmd.reserve((sizeof("callvote kick ") / sizeof("")) + 3);
+								cmd.append(XORSTR("callvote kick "));
+								cmd.append(std::to_string(entityInformation.userid));
+								engine->ClientCmd_Unrestricted(cmd.c_str());
+							}
+
+							if (ImGui::Button(XORSTR("Fake Votekick (delayed)")))
+								FakeVote::Votekick(entityInformation.userid);
+						}
+					}
 				}
-			}
-			ImGui::NextColumn();
-			{
-				if (ImGui::Button(XORSTR("Print information")))
-				{
-					cvar->ConsoleColorPrintf(ColorRGBA(255, 255, 255), XORSTR("\n=====\nPlayer informations:\n[%s] %s \nSteamID: %s\n=====\n"),(*csPlayerResource)->GetClan(currentPlayer), entityInformation.name, entityInformation.guid);
-				}
+				ImGui::EndChild();
 			}
 		}
-
 		ImGui::End();
 	}
 }

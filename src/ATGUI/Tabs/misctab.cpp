@@ -225,8 +225,9 @@ void Misc::RenderTab()
 			ImGui::Separator();
 			ImGui::Columns(2, nullptr, true);
 			{
-				ImGui::Checkbox(XORSTR("Enabled"), &Settings::ThirdPerson::enabled);
+				ImGui::Checkbox(XORSTR("Key Enabled"), &Settings::ThirdPerson::enabled);
 			    ImGui::Text(XORSTR("Showed Angle"));
+				ImGui::Text(XORSTR("Toggle Key"));
 			}
 			ImGui::NextColumn();
 			{
@@ -234,6 +235,7 @@ void Misc::RenderTab()
 				ImGui::SliderFloat(XORSTR("##TPCAMOFFSET"), &Settings::ThirdPerson::distance, 0.f, 500.f, XORSTR("Camera Offset: %0.f"));
                 ImGui::Combo(XORSTR("Showed Angle"), (int*)& Settings::ThirdPerson::type, angleTypes, IM_ARRAYSIZE(angleTypes));
 				ImGui::PopItemWidth();
+				UI::KeyBindButton(&Settings::ThirdPerson::key);
 			}
 			ImGui::Columns(1);
 			ImGui::Separator();
@@ -367,7 +369,7 @@ void Misc::RenderTab()
 				ImGui::PushItemWidth(-1);
 				if (ImGui::Combo(XORSTR("##ANIMATIONTYPE"), (int*)& Settings::ClanTagChanger::type, animationTypes, IM_ARRAYSIZE(animationTypes)))
 					ClanTagChanger::UpdateClanTagCallback();
-				if (ImGui::SliderInt(XORSTR("##ANIMATIONSPEED"), &Settings::ClanTagChanger::animationSpeed, 500, 2000))
+				if (ImGui::SliderInt(XORSTR("##ANIMATIONSPEED"), &Settings::ClanTagChanger::animationSpeed, 0, 2000))
 					ClanTagChanger::UpdateClanTagCallback();
 				ImGui::PopItemWidth();
 			}
@@ -383,7 +385,7 @@ void Misc::RenderTab()
 				NameChanger::SetName(std::string(nickname).c_str());
 
 			if (ImGui::Button(XORSTR("Glitch Name")))
-				NameChanger::SetName("\n\xAD\xAD\xAD");
+				NameChanger::SetName(XORSTR("\n\xAD\xAD\xAD"));
 			ImGui::SameLine();
 			if (ImGui::Button(XORSTR("No Name")))
 			{
@@ -423,6 +425,21 @@ void Misc::RenderTab()
 
 			ImGui::Columns(1);
 			ImGui::Separator();
+			ImGui::Text(XORSTR("FakeVote"));
+			ImGui::Separator();
+			ImGui::Columns(2, nullptr, true);
+			{
+				ImGui::Text(XORSTR("Message"));
+			}
+			ImGui::NextColumn();
+			{
+				ImGui::PushItemWidth(-1);
+				ImGui::InputText(XORSTR("##FAKEVOTEMSG"), Settings::FakeVote::message, 128);
+				ImGui::PopItemWidth();
+			}
+
+			ImGui::Columns(1);
+			ImGui::Separator();
 			ImGui::Text(XORSTR("Other"));
 			ImGui::Separator();
 			ImGui::Columns(2, nullptr, true);
@@ -434,7 +451,7 @@ void Misc::RenderTab()
 				ImGui::Checkbox(XORSTR("Autoblock"), &Settings::Autoblock::enabled);
 				ImGui::Checkbox(XORSTR("Jump Throw"), &Settings::JumpThrow::enabled);
 				ImGui::Checkbox(XORSTR("Auto Defuse"), &Settings::AutoDefuse::enabled);
-				ImGui::Checkbox(XORSTR("Sniper Crosshair"), &Settings::SniperCrosshair::enabled);
+				ImGui::Checkbox(XORSTR("Left Handed Knife"), &Settings::LeftKnife::enabled);
 				ImGui::Checkbox(XORSTR("Disable post-processing"), &Settings::DisablePostProcessing::enabled);
 				ImGui::Checkbox(XORSTR("No Duck Cooldown"), &Settings::NoDuckCooldown::enabled);
 			}
@@ -450,6 +467,7 @@ void Misc::RenderTab()
 				UI::KeyBindButton(&Settings::JumpThrow::key);
 				ImGui::Checkbox(XORSTR("Silent Defuse"), &Settings::AutoDefuse::silent);
 				ImGui::Checkbox(XORSTR("Attempt NoFall"), &Settings::NoFall::enabled);
+				ImGui::Checkbox(XORSTR("AWP Quick Switch"), &Settings::QuickSwitch::enabled);
 			}
 			ImGui::Columns(1);
 			ImGui::Separator();

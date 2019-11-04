@@ -22,7 +22,7 @@ void Visuals::RenderTab()
 	const char* ArmsTypes[] = { "Default", "Wireframe", "None" };
 	const char* WeaponTypes[] = { "Default", "Wireframe", "None" };
 	const char* SmokeTypes[] = { "Wireframe", "None" };
-    const char* Sounds[] = { "None", "SpongeBob", "Half life", "Half life 2", "Half life 3", "Half life 4", "BB Gun Bell", "Dopamine", "Wub", "Pedo Yes!", "Meme", "Error", "Orchestral" };
+    const char* Sounds[] = { "None", "SpongeBob", "Half life", "Half life 2", "Half life 3", "Half life 4", "BB Gun Bell", "Dopamine", "Wub", "Pedo Yes!", "Meme", "Error", "Orchestral", "GameSense" };
 	const char* SkyBoxes[] = {
 			"cs_baggage_skybox_", // 0
 			"cs_tibet",
@@ -102,6 +102,7 @@ void Visuals::RenderTab()
 				ImGui::ItemSize(ImVec2(0.0f, 0.0f), 0.0f);
 				ImGui::Checkbox(XORSTR("Bullet Tracers"), &Settings::ESP::BulletTracers::enabled);
 				ImGui::Checkbox(XORSTR("Head Dot"), &Settings::ESP::HeadDot::enabled);
+				ImGui::Checkbox(XORSTR("Show Entity Distance"), &Settings::ESP::entityDistance);
 			}
 			ImGui::NextColumn();
 			{
@@ -188,7 +189,6 @@ void Visuals::RenderTab()
 				ImGui::Checkbox(XORSTR("Hostages"), &Settings::ESP::Filters::hostages);
 			}
 			ImGui::Columns(1);
-
 			ImGui::Separator();
 			ImGui::Text(XORSTR("Danger Zone"));
 			ImGui::Separator();
@@ -249,6 +249,7 @@ void Visuals::RenderTab()
 				ImGui::Checkbox(XORSTR("Recoil Crosshair"), &Settings::Recoilcrosshair::enabled);
 				ImGui::Checkbox(XORSTR("FOV Circle"), &Settings::ESP::FOVCrosshair::enabled);
 				ImGui::Checkbox(XORSTR("Show Spread"), &Settings::ESP::Spread::enabled);
+				ImGui::Checkbox(XORSTR("Sniper Crosshair"), &Settings::SniperCrosshair::enabled);
 			}
 			ImGui::NextColumn();
 			{
@@ -512,6 +513,7 @@ void Visuals::RenderTab()
 				ImGui::SliderInt(XORSTR("##HITMARKERSIZE"), &Settings::ESP::Hitmarker::size, 1, 32, XORSTR("Size: %0.f"));
 				ImGui::SliderInt(XORSTR("##HITMARKERGAP"), &Settings::ESP::Hitmarker::innerGap, 1, 16, XORSTR("Gap: %0.f"));
                 ImGui::Combo( XORSTR ( "Sounds##HITMARKERCOMBO" ), ( int* ) &Settings::ESP::Hitmarker::Sounds::sound, Sounds, IM_ARRAYSIZE( Sounds ) );
+				ImGui::SliderFloat(XORSTR("##HITMARKERS"), &Settings::ESP::Hitmarker::Sounds::volume, 0.1f, 1.f, XORSTR("Volume: %0.1f"));
                 ImGui::PopItemWidth();
 			}
 			ImGui::Columns(1);

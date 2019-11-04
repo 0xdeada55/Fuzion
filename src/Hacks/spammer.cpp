@@ -169,7 +169,7 @@ void Spammer::BeginFrame(float frameTime)
 				str << Util::Items::GetItemDisplayName(*activeWeapon->GetItemDefinitionIndex()) << " | ";
 
 			if (Settings::Spammer::PositionSpammer::showRank)
-				str << ESP::ranks[*(*csPlayerResource)->GetCompetitiveRanking(i)] << " | ";
+				str << (Util::IsDangerZone() ?  ESP::dzRanks[*(*csPlayerResource)->GetCompetitiveRanking(i)] : ESP::ranks[*(*csPlayerResource)->GetCompetitiveRanking(i)]) << " | ";
 
 			if (Settings::Spammer::PositionSpammer::showWins)
 				str << *(*csPlayerResource)->GetCompetitiveWins(i) << XORSTR(" wins | ");
