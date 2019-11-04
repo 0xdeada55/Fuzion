@@ -112,7 +112,7 @@ bool Settings::ESP::Sounds::enabled = false;
 int Settings::ESP::Sounds::time = 1000;
 bool Settings::NoScopeBorder::enabled = false;
 bool Settings::ESP::HeadDot::enabled = false;
-bool Settings::ESP::backtrack::enabled = false;
+bool Settings::ESP::Backtrack::enabled = false;
 float Settings::ESP::HeadDot::size = 2.f;
 
 bool Settings::ESP::Spread::enabled = false;
@@ -928,7 +928,7 @@ static void DrawHeaddot( C_BasePlayer* player ) {
 
 	Draw::AddCircleFilled( head2D.x, head2D.y, Settings::ESP::HeadDot::size, ESP::GetESPPlayerColor( player, bIsVisible ), 10 );
 }
-static void Drawbacktrack( C_BasePlayer* player ) {
+static void DrawBacktrack(C_BasePlayer* player ) {
 
 	Vector head2D;
 
@@ -1209,8 +1209,8 @@ static void DrawPlayer(C_BasePlayer* player)
 	if (Settings::ESP::HeadDot::enabled)
 		DrawHeaddot(player);
 
-	if (Settings::ESP::backtrack::enabled)
-		Drawbacktrack(player);
+	if (Settings::ESP::Backtrack::enabled)
+        DrawBacktrack(player);
 
 	if (Settings::Debug::AutoWall::debugView)
 		DrawAutoWall(player);

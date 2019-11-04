@@ -847,7 +847,7 @@ namespace Settings
 			extern float size;
 		}
 		
-		namespace backtrack
+		namespace Backtrack
 		{
 			extern bool enabled;
 		}
