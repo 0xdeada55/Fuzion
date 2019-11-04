@@ -103,6 +103,7 @@ void Visuals::RenderTab()
 				ImGui::Checkbox(XORSTR("Bullet Tracers"), &Settings::ESP::BulletTracers::enabled);
 				ImGui::Checkbox(XORSTR("Head Dot"), &Settings::ESP::HeadDot::enabled);
 				ImGui::Checkbox(XORSTR("Show Entity Distance"), &Settings::ESP::entityDistance);
+				ImGui::Checkbox(XORSTR("Backtrack"), &Settings::ESP::backtrack::enabled);
 			}
 			ImGui::NextColumn();
 			{

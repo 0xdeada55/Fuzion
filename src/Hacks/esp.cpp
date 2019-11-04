@@ -2,6 +2,7 @@
 
 #include "esp.h"
 #include "autowall.h"
+#include "lagcomp.h"
 #include "../fonts.h"
 #include "../settings.h"
 #include "../interfaces.h"
@@ -111,6 +112,7 @@ bool Settings::ESP::Sounds::enabled = false;
 int Settings::ESP::Sounds::time = 1000;
 bool Settings::NoScopeBorder::enabled = false;
 bool Settings::ESP::HeadDot::enabled = false;
+bool Settings::ESP::backtrack::enabled = false;
 float Settings::ESP::HeadDot::size = 2.f;
 
 bool Settings::ESP::Spread::enabled = false;
@@ -172,6 +174,8 @@ std::mutex footstepMutex;
 std::deque<Footstep> playerFootsteps[64]; // entIndex -> Footstep.
 
 QAngle viewanglesBackup;
+QAngle fake;
+QAngle actual;
 
 const char* ESP::ranks[] = {
 		"Unranked",
@@ -680,7 +684,96 @@ static void DrawBulletTrace( C_BasePlayer* player ) {
 		return;
 
 	Draw::AddLine( src.x, src.y, dst.x, dst.y, ESP::GetESPPlayerColor( player, true ) );
-	Draw::AddRectFilled( ( int ) ( dst.x - 3 ), ( int ) ( dst.y - 3 ), 6, 6, ESP::GetESPPlayerColor( player, false ) );
+	// Draw::AddRectFilled( ( int ) ( dst.x - 3 ), ( int ) ( dst.y - 3 ), 6, 6, ESP::GetESPPlayerColor( player, false ) ); // do we really need this? it's not drawing in valve and buggy in imgui
+}
+static void DrawAATrace( QAngle fake, QAngle actual ) {
+	C_BasePlayer* localPlayer = ( C_BasePlayer* ) entityList->GetClientEntity( engine->GetLocalPlayer() );
+	Vector src3D, dst3D, forward;
+	Vector src, dst;
+	trace_t tr;
+	Ray_t ray;
+	CTraceFilter filter;
+	char* string;
+	Vector2D nameSize;
+	ImColor color;
+
+	filter.pSkip = localPlayer;
+	src3D = localPlayer->GetVecOrigin();
+// LBY
+	Math::AngleVectors( QAngle(0, *localPlayer->GetLowerBodyYawTarget(), 0), forward );
+	dst3D = src3D + ( forward * 50 );
+
+	ray.Init( src3D, dst3D );
+
+	trace->TraceRay( ray, MASK_SHOT, &filter, &tr );
+
+	if ( debugOverlay->ScreenPosition( src3D, src ) || debugOverlay->ScreenPosition( tr.endpos, dst ) )
+		return;
+
+	color = ImColor( 135, 235, 169 );
+	Draw::AddLine( src.x, src.y, dst.x, dst.y, color );
+	// Draw::AddRectFilled( ( int ) ( dst.x - 3 ), ( int ) ( dst.y - 3 ), 6, 6, color );
+	string = XORSTR("LBY");
+	nameSize = Draw::GetTextSize( string, esp_font );
+	Draw::AddText(dst.x, dst.y, string, color );
+//////////////////////////////////
+
+// FAKE
+	Math::AngleVectors( QAngle(0, fake.y, 0), forward );
+	dst3D = src3D + ( forward * 50.f );
+
+	ray.Init( src3D, dst3D );
+
+	trace->TraceRay( ray, MASK_SHOT, &filter, &tr );
+
+	if ( debugOverlay->ScreenPosition( src3D, src ) || debugOverlay->ScreenPosition( tr.endpos, dst ) )
+		return;
+
+	color = ImColor( 5, 200, 5 );
+	Draw::AddLine( src.x, src.y, dst.x, dst.y, color );
+	// Draw::AddRectFilled( ( int ) ( dst.x - 3 ), ( int ) ( dst.y - 3 ), 6, 6, color );
+	string = XORSTR("FAKE");
+	nameSize = Draw::GetTextSize( string, esp_font );
+	Draw::AddText(dst.x, dst.y, string, color );
+//////////////////////////////////
+
+// ACTUAL
+	Math::AngleVectors( QAngle(0, actual.y, 0), forward );
+	dst3D = src3D + ( forward * 50.f );
+
+	ray.Init( src3D, dst3D );
+
+	trace->TraceRay( ray, MASK_SHOT, &filter, &tr );
+
+	if ( debugOverlay->ScreenPosition( src3D, src ) || debugOverlay->ScreenPosition( tr.endpos, dst ) )
+		return;
+
+	color = ImColor( 225, 5, 5 );
+	Draw::AddLine( src.x, src.y, dst.x, dst.y, color );
+	// Draw::AddRectFilled( ( int ) ( dst.x - 3 ), ( int ) ( dst.y - 3 ), 6, 6, color );
+	string = XORSTR("REAL");
+	nameSize = Draw::GetTextSize( string, esp_font );
+	Draw::AddText(dst.x, dst.y, string, color );
+//////////////////////////////////
+
+// FEET YAW
+	Math::AngleVectors( QAngle(0, localPlayer->GetAnimState()->currentFeetYaw, 0), forward );
+	dst3D = src3D + ( forward * 50.f );
+
+	ray.Init( src3D, dst3D );
+
+	trace->TraceRay( ray, MASK_SHOT, &filter, &tr );
+
+	if ( debugOverlay->ScreenPosition( src3D, src ) || debugOverlay->ScreenPosition( tr.endpos, dst ) )
+		return;
+
+	color = ImColor( 225, 225, 80 );
+	Draw::AddLine( src.x, src.y, dst.x, dst.y, color );
+	// Draw::AddRectFilled( ( int ) ( dst.x - 3 ), ( int ) ( dst.y - 3 ), 6, 6, color );
+	string = XORSTR("FEET");
+	nameSize = Draw::GetTextSize( string, esp_font );
+	Draw::AddText(dst.x, dst.y, string, color );
+//////////////////////////////////
 }
 static void DrawTracer( C_BasePlayer* player ) {
 	Vector src3D;
@@ -834,6 +927,20 @@ static void DrawHeaddot( C_BasePlayer* player ) {
 		bIsVisible = Entity::IsVisible( player, ( int ) Bone::BONE_HEAD, 180.f, Settings::ESP::Filters::smokeCheck );
 
 	Draw::AddCircleFilled( head2D.x, head2D.y, Settings::ESP::HeadDot::size, ESP::GetESPPlayerColor( player, bIsVisible ), 10 );
+}
+static void Drawbacktrack( C_BasePlayer* player ) {
+
+	Vector head2D;
+
+    for (auto& tick : LagComp::ticks)
+    {
+        for (auto& record : tick.records)
+        {
+        	if ( debugOverlay->ScreenPosition( record.head, head2D ) )
+				continue;
+			Draw::AddCircleFilled( head2D.x, head2D.y, Settings::ESP::HeadDot::size, ESP::GetESPPlayerColor( player, false ), 3 );
+        }
+    }
 }
 
 static void DrawSounds( C_BasePlayer *player, ImColor playerColor ) {
@@ -1101,6 +1208,9 @@ static void DrawPlayer(C_BasePlayer* player)
 
 	if (Settings::ESP::HeadDot::enabled)
 		DrawHeaddot(player);
+
+	if (Settings::ESP::backtrack::enabled)
+		Drawbacktrack(player);
 
 	if (Settings::Debug::AutoWall::debugView)
 		DrawAutoWall(player);
@@ -1770,13 +1880,15 @@ void ESP::Paint()
 				DrawDZItems(entity, localplayer);
 		}
 	}
-
+	if (Settings::ThirdPerson::enabled)
+		DrawAATrace(fake, actual);
 	if (Settings::ESP::FOVCrosshair::enabled)
 		DrawFOVCrosshair();
 	if (Settings::ESP::Spread::enabled || Settings::ESP::Spread::spreadLimit)
 		DrawSpread();
 	if (Settings::NoScopeBorder::enabled && localplayer->IsScoped())
 		DrawScope();
+
 }
 
 void ESP::DrawModelExecute()
@@ -1794,6 +1906,11 @@ void ESP::DrawModelExecute()
 void ESP::CreateMove(CUserCmd* cmd)
 {
 	viewanglesBackup = cmd->viewangles;
+
+	if(CreateMove::sendPacket)
+		fake = CreateMove::lastTickViewAngles;
+	else
+		actual = cmd->viewangles;
 
     if( Settings::ESP::enabled && Settings::ESP::Sounds::enabled && (Settings::ESP::Filters::allies || Settings::ESP::Filters::enemies || Settings::ESP::Filters::localplayer) ){
         CheckActiveSounds();

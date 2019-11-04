@@ -1,5 +1,6 @@
 #include "aimbot.h"
 #include "autowall.h"
+#include "fakelag.h"
 
 #include "../Utils/xorstring.h"
 #include "../Utils/math.h"
@@ -54,6 +55,8 @@ bool Settings::Aimbot::SmokeCheck::enabled = false;
 bool Settings::Aimbot::FlashCheck::enabled = false;
 bool Settings::Aimbot::SpreadLimit::enabled = false;
 float Settings::Aimbot::SpreadLimit::value = 0.1f;
+bool Settings::Aimbot::HitChance::enabled = false;
+float Settings::Aimbot::HitChance::value = 80.f;
 bool Settings::Aimbot::Smooth::Salting::enabled = false;
 float Settings::Aimbot::Smooth::Salting::multiplier = 0.0f;
 bool Settings::Aimbot::AutoSlow::enabled = false;
@@ -68,6 +71,7 @@ std::vector<long> killTimes = { 0 }; // the Epoch time from when we kill someone
 bool shouldAim;
 QAngle AimStepLastAngle;
 QAngle RCSLastPunch;
+C_BasePlayer* Aimbot::curtarget;
 
 int Aimbot::targetAimbot = -1;
 const int headVectors = 11;
@@ -129,6 +133,68 @@ static bool HeadMultiPoint(C_BasePlayer *player, Vector points[])
 
 	return true;
 }
+
+bool Aimbot::HitChance(Vector bestSpot, C_BasePlayer* player, C_BaseCombatWeapon* activeWeapon, float hitChance)
+{
+    C_BasePlayer* localplayer = (C_BasePlayer*) entityList->GetClientEntity(engine->GetLocalPlayer());
+
+    Vector src = localplayer->GetEyePosition();
+    QAngle angle = Math::CalcAngle(src, bestSpot);
+    Math::NormalizeAngles(angle);
+
+	Vector forward, right, up;
+    Math::AngleVectors(angle, forward, right, up);
+
+    int hitCount = 0;
+    int NeededHits = static_cast<int>(255.f * (hitChance / 100.f));
+
+    activeWeapon->UpdateAccuracyPenalty();
+    float weap_spread = activeWeapon->GetSpread();
+    float weap_inaccuracy = activeWeapon->GetInaccuracy();
+
+    for (int i = 0; i < 255; i++) {
+    	RandomSeed(i + 1); // if we can't calculate spread like game does, then at least use same functions XD
+        float b = RandomFloat(0.f, 2.f * (float)M_PI);
+        float spread = weap_spread * RandomFloat(0.f, 1.0f);
+        float d = RandomFloat(0.f, 2.f * (float)M_PI);
+        float inaccuracy = weap_inaccuracy * RandomFloat(0.f, 1.0f);
+
+        Vector spreadView((cos(b) * inaccuracy) + (cos(d) * spread), (sin(b) * inaccuracy) + (sin(d) * spread), 0), direction;
+
+        direction.x = forward.x + (spreadView.x * right.x) + (spreadView.y * up.x);
+		direction.y = forward.y + (spreadView.x * right.y) + (spreadView.y * up.y);
+		direction.z = forward.z + (spreadView.x * right.z) + (spreadView.y * up.z);
+		direction.Normalize();
+
+        QAngle viewAnglesSpread;
+        Math::VectorAngles(direction, up, viewAnglesSpread);
+		Math::NormalizeAngles(viewAnglesSpread);
+
+		Vector viewForward;
+		Math::AngleVectors(viewAnglesSpread, viewForward);
+		viewForward.NormalizeInPlace();
+
+		viewForward = src + (viewForward * activeWeapon->GetCSWpnData()->GetRange());
+
+        trace_t tr;
+        Ray_t ray;
+
+        ray.Init(src, viewForward);
+        trace->ClipRayToEntity(ray, MASK_SHOT | CONTENTS_GRATE, player, &tr);
+
+        if (tr.m_pEntityHit == player)
+            hitCount++;
+
+        if (static_cast<int>((static_cast<float>(hitCount) / 255.f) * 100.f) >= hitChance)
+			return true;
+
+		if ((255 - i + hitCount) < NeededHits)
+			return false;
+    }
+
+    return false;
+}
+
 static float AutoWallBestSpot(C_BasePlayer *player, Vector &bestSpot)
 {
 	float bestDamage = Settings::Aimbot::AutoWall::value;
@@ -575,6 +641,20 @@ static void AutoCrouch(C_BasePlayer* player, CUserCmd* cmd)
 	cmd->buttons |= IN_BULLRUSH | IN_DUCK;
 }
 
+static void LagSpike(C_BasePlayer* player, CUserCmd* cmd)
+{
+    if (!Settings::FakeLag::enabled && !Settings::FakeLag::adaptive)
+        return;
+
+    if (!player)
+    {
+        FakeLag::lagSpike = false;
+        return;
+    }
+
+    FakeLag::lagSpike = true;
+}
+
 static void AutoSlow(C_BasePlayer* player, float& forward, float& sideMove, float& bestDamage, C_BaseCombatWeapon* active_weapon, CUserCmd* cmd)
 {
 
@@ -666,7 +746,7 @@ static void AutoPistol(C_BaseCombatWeapon* activeWeapon, CUserCmd* cmd)
         cmd->buttons &= ~IN_ATTACK;
 }
 
-static void AutoShoot(C_BasePlayer* player, C_BaseCombatWeapon* activeWeapon, CUserCmd* cmd)
+static void AutoShoot(C_BasePlayer* player, Vector bestSpot, C_BaseCombatWeapon* activeWeapon, CUserCmd* cmd)
 {
 	if (!Settings::Aimbot::AutoShoot::enabled)
 		return;
@@ -696,6 +776,8 @@ static void AutoShoot(C_BasePlayer* player, C_BaseCombatWeapon* activeWeapon, CU
 		return;
 	if( Settings::Aimbot::SpreadLimit::enabled && ((activeWeapon->GetSpread() + activeWeapon->GetInaccuracy()) > Settings::Aimbot::SpreadLimit::value))
 		return;
+	if( Settings::Aimbot::HitChance::enabled && !Aimbot::HitChance(bestSpot, player, activeWeapon, Settings::Aimbot::HitChance::value) )
+	 	return;
 
 	float nextPrimaryAttack = activeWeapon->GetNextPrimaryAttack();
 
@@ -759,6 +841,10 @@ void Aimbot::CreateMove(CUserCmd* cmd)
 	Vector localEye = localplayer->GetEyePosition();
 
 	shouldAim = Settings::Aimbot::AutoShoot::enabled;
+    Vector bestSpot = {0,0,0};
+	float bestDamage = 0.0f;
+	C_BasePlayer* player = GetClosestPlayerAndSpot(cmd, !Settings::Aimbot::AutoWall::enabled, &bestSpot, &bestDamage);
+	Aimbot::curtarget = player;
 
 	if (Settings::Aimbot::IgnoreJump::enabled && (!(localplayer->GetFlags() & FL_ONGROUND) && localplayer->GetMoveType() != MOVETYPE_LADDER))
 		return;
@@ -776,10 +862,6 @@ void Aimbot::CreateMove(CUserCmd* cmd)
 		if (Util::Items::IsScopeable(*activeWeapon->GetItemDefinitionIndex()) && !localplayer->IsScoped())
 			return;
 	}
-
-    Vector bestSpot = {0,0,0};
-	float bestDamage = 0.0f;
-	C_BasePlayer* player = GetClosestPlayerAndSpot(cmd, !Settings::Aimbot::AutoWall::enabled, &bestSpot, &bestDamage);
 
 	if (player)
 	{
@@ -828,7 +910,7 @@ void Aimbot::CreateMove(CUserCmd* cmd)
 	AutoCrouch(player, cmd);
 	AutoSlow(player, oldForward, oldSideMove, bestDamage, activeWeapon, cmd);
 	AutoPistol(activeWeapon, cmd);
-	AutoShoot(player, activeWeapon, cmd);
+	AutoShoot(player, bestSpot, activeWeapon, cmd);
 	AutoCock(player, activeWeapon, cmd);
 	RCS(angle, player, cmd);
 	Smooth(player, angle);
@@ -919,6 +1001,8 @@ void Aimbot::UpdateValues()
 	Settings::Aimbot::FlashCheck::enabled = currentWeaponSetting.flashCheck;
 	Settings::Aimbot::SpreadLimit::enabled = currentWeaponSetting.spreadLimitEnabled;
 	Settings::Aimbot::SpreadLimit::value = currentWeaponSetting.spreadLimit;
+	Settings::Aimbot::HitChance::enabled = currentWeaponSetting.hitChanceEnabled;
+	Settings::Aimbot::HitChance::value = currentWeaponSetting.hitChance;
 	Settings::Aimbot::AutoWall::enabled = currentWeaponSetting.autoWallEnabled;
 	Settings::Aimbot::AutoWall::value = currentWeaponSetting.autoWallValue;
 	Settings::Aimbot::AutoSlow::enabled = currentWeaponSetting.autoSlow;

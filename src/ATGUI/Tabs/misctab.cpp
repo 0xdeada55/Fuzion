@@ -454,6 +454,7 @@ void Misc::RenderTab()
 				ImGui::Checkbox(XORSTR("Left Handed Knife"), &Settings::LeftKnife::enabled);
 				ImGui::Checkbox(XORSTR("Disable post-processing"), &Settings::DisablePostProcessing::enabled);
 				ImGui::Checkbox(XORSTR("No Duck Cooldown"), &Settings::NoDuckCooldown::enabled);
+				ImGui::Checkbox(XORSTR("BackTrack"), &Settings::LagComp::enabled);
 			}
 			ImGui::NextColumn();
 			{

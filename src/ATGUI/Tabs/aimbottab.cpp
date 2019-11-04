@@ -51,6 +51,8 @@ static bool smokeCheck = false;
 static bool flashCheck = false;
 static bool spreadLimitEnabled = false;
 static float spreadLimit = 0.1f;
+static bool hitChanceEnabled = false;
+static float hitChance = 80.f;
 static bool autoWallEnabled = false;
 static float autoWallValue = 10.0f;
 static bool autoAimRealDistance = false;
@@ -100,6 +102,8 @@ void UI::ReloadWeaponSettings()
 	flashCheck = Settings::Aimbot::weapons.at(index).flashCheck;
 	spreadLimitEnabled = Settings::Aimbot::weapons.at(index).spreadLimitEnabled;
 	spreadLimit = Settings::Aimbot::weapons.at(index).spreadLimit;
+	hitChanceEnabled = Settings::Aimbot::weapons.at(index).hitChanceEnabled;
+	hitChance = Settings::Aimbot::weapons.at(index).hitChance;
 	autoWallEnabled = Settings::Aimbot::weapons.at(index).autoWallEnabled;
 	autoWallValue = Settings::Aimbot::weapons.at(index).autoWallValue;
 	autoAimRealDistance = Settings::Aimbot::weapons.at(index).autoAimRealDistance;
@@ -132,6 +136,7 @@ void UI::UpdateWeaponSettings()
 			.rcsEnabled = rcsEnabled,
 			.rcsAlwaysOn = rcsAlwaysOn,
 			.spreadLimitEnabled = spreadLimitEnabled,
+			.hitChanceEnabled = hitChanceEnabled,
 			.autoPistolEnabled = autoPistolEnabled,
 			.autoShootEnabled = autoShootEnabled,
 			.autoScopeEnabled = autoScopeEnabled,
@@ -160,6 +165,7 @@ void UI::UpdateWeaponSettings()
 			.rcsAmountY = rcsAmountY,
 			.autoWallValue = autoWallValue,
 			.spreadLimit = spreadLimit,
+			.hitChance = hitChance,
 	};
 
 	for (int bone = (int) DesiredBones::BONE_PELVIS; bone <= (int) DesiredBones::BONE_RIGHT_SOLE; bone++)
@@ -417,6 +423,10 @@ void Aimbot::RenderTab()
 			if( ImGui::Checkbox(XORSTR("Spread Limit"), &spreadLimitEnabled) )
 				UI::UpdateWeaponSettings();
 			if( ImGui::SliderFloat(XORSTR("##SPREADLIMIT"), &spreadLimit, 0, 0.1) )
+				UI::UpdateWeaponSettings();
+			if( ImGui::Checkbox(XORSTR("Hit Chance"), &hitChanceEnabled) )
+				UI::UpdateWeaponSettings();
+			if( ImGui::SliderFloat(XORSTR("##hitChance"), &hitChance, 0, 100) )
 				UI::UpdateWeaponSettings();
 			ImGui::EndChild();
 		}

@@ -49,7 +49,7 @@ void MainThread()
 	Hooker::FindLineGoesThroughSmoke();
 	Hooker::FindInitKeyValues();
 	Hooker::FindLoadFromBuffer();
-	//Hooker::FindVstdlibFunctions();
+	Hooker::FindVstdlibFunctions();
 	Hooker::FindOverridePostProcessingDisable();
 	Hooker::HookSwapWindow();
 	Hooker::HookPollEvent();
@@ -64,6 +64,7 @@ void MainThread()
 
     clientVMT = new VMT(client);
     clientVMT->HookVM(Hooks::FrameStageNotify, 37);
+    clientVMT->HookVM(Hooks::DispatchUserMessage, 38);
 	clientVMT->ApplyVMT();
 
     clientModeVMT = new VMT(clientMode);
